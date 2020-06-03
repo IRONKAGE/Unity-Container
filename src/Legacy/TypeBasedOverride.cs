@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using Unity.Policy;
 
 namespace Unity.Resolution
 {
@@ -10,18 +9,12 @@ namespace Unity.Resolution
     /// This checks to see if the current type being built is the
     /// right one before checking the inner <see cref="ResolverOverride"/>.
     /// </summary>
-    [Obsolete("This type has been deprecated as degrading performance. Use DependencyOverride instead.", false)]
+    [Obsolete("This type has been deprecated as degrading performance. Use ResolverOverride.OnType() instead.", false)]
     public class TypeBasedOverride : ResolverOverride,
                                      IEquatable<ParameterInfo>,
-                                     IEquatable<PropertyInfo>
+                                     IEquatable<PropertyInfo>,
+                                     IEquatable<FieldInfo>
     {
-        #region Fields
-
-        private readonly ResolverOverride _innerOverride;
-
-        #endregion
-
-
         #region Constructors
 
         /// <summary>
@@ -30,20 +23,9 @@ namespace Unity.Resolution
         /// <param name="targetType">Type to check for.</param>
         /// <param name="innerOverride">Inner override to check after type matches.</param>
         public TypeBasedOverride(Type targetType, ResolverOverride innerOverride)
-            : base(targetType, null, null)
+            : base(targetType, null, innerOverride ?? throw new ArgumentNullException(nameof(innerOverride)))
         {
-            _innerOverride = (innerOverride ?? throw new ArgumentNullException(nameof(innerOverride)))
-                .OnType(targetType ?? throw new ArgumentNullException(nameof(targetType)));
-        }
-
-        #endregion
-
-
-        #region ResolverOverride
-
-        public override ResolveDelegate<TContext> GetResolver<TContext>(Type type)
-        {
-            return _innerOverride.GetResolver<TContext>(type);
+            innerOverride.OnType(targetType);
         }
 
         #endregion
@@ -58,18 +40,24 @@ namespace Unity.Resolution
 
         public override bool Equals(object obj)
         {
-            return _innerOverride.Equals(obj);
+            return Value.Equals(obj);
+        }
+
+        public bool Equals(FieldInfo other)
+        {
+            return Value is IEquatable<FieldInfo> info &&
+                   info.Equals(other);
         }
 
         public bool Equals(PropertyInfo other)
         {
-            return _innerOverride is IEquatable<PropertyInfo> info && 
+            return Value is IEquatable<PropertyInfo> info && 
                    info.Equals(other);
         }
 
         public bool Equals(ParameterInfo other)
         {
-            return _innerOverride is IEquatable<ParameterInfo> info && 
+            return Value is IEquatable<ParameterInfo> info && 
                    info.Equals(other);
         }
 
@@ -81,7 +69,7 @@ namespace Unity.Resolution
     /// specify the type to construct via generics syntax.
     /// </summary>
     /// <typeparam name="T">Type to check for.</typeparam>
-    [Obsolete("This type has been deprecated as degrading performance. Use DependencyOverride instead.", false)]
+    [Obsolete("This type has been deprecated as degrading performance. Use ResolverOverride.OnType() instead.", false)]
     public class TypeBasedOverride<T> : TypeBasedOverride
     {
         /// <summary>
