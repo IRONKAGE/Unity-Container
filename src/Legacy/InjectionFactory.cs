@@ -43,6 +43,8 @@ namespace Unity.Injection
             _factoryFunc = factoryFunc ?? throw new ArgumentNullException(nameof(factoryFunc));
         }
 
+        public override bool BuildRequired => false;
+
         #endregion
 
 
