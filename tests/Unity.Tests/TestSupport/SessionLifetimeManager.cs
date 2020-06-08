@@ -32,10 +32,6 @@ namespace Unity.Tests.v5.TestSupport
         {
         }
 
-        public override void RemoveValue(ILifetimeContainer container = null)
-        {
-        }
-
         protected override LifetimeManager OnCreateLifetimeManager()
         {
             throw new NotImplementedException();
