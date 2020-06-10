@@ -38,7 +38,7 @@ namespace Unity
             {
                 LifetimeManager manager = (null != lifetimeManager) 
                                         ? (LifetimeManager)lifetimeManager 
-                                        : TypeLifetimeManager.CreateLifetimePolicy();
+                                        : TypeLifetimeManager.Clone();
                 if (manager.InUse) throw new InvalidOperationException(LifetimeManagerInUse);
 
                 // Create registration and add to appropriate storage
@@ -108,13 +108,13 @@ namespace Unity
         #region Instance Registration
 
         /// <inheritdoc />
-        IUnityContainer IUnityContainer.RegisterInstance(Type type, string name, object instance, IInstanceLifetimeManager lifetimeManager)
+        IUnityContainer IUnityContainer.RegisterInstance(Type type, string name, object instance, IInstanceLifetimeManager lifetimeManager, InjectionMember[] injectionMembers)
         {
             var mappedToType = instance?.GetType();
             var typeFrom = type ?? mappedToType;
             LifetimeManager manager = (null != lifetimeManager)
                                     ? (LifetimeManager)lifetimeManager
-                                    : InstanceLifetimeManager.CreateLifetimePolicy();
+                                    : InstanceLifetimeManager.Clone();
             try
             {
                 // Validate input
@@ -170,11 +170,11 @@ namespace Unity
         #region Factory Registration
 
         /// <inheritdoc />
-        public IUnityContainer RegisterFactory(Type type, string name, Func<IUnityContainer, Type, string, object> factory, IFactoryLifetimeManager lifetimeManager)
+        public IUnityContainer RegisterFactory(Type type, string name, Func<IUnityContainer, Type, string, object> factory, IFactoryLifetimeManager lifetimeManager, InjectionMember[] injectionMembers)
         {
             LifetimeManager manager = (null != lifetimeManager)
                                     ? (LifetimeManager)lifetimeManager
-                                    : FactoryLifetimeManager.CreateLifetimePolicy();
+                                    : FactoryLifetimeManager.Clone();
             // Validate input
             if (null == type) throw new ArgumentNullException(nameof(type));
             if (null == factory) throw new ArgumentNullException(nameof(factory));
@@ -185,8 +185,8 @@ namespace Unity
 #pragma warning disable CS0618 // TODO: InjectionFactory
             var injectionFactory = new InjectionFactory(factory);
 #pragma warning restore CS0618
-            var injectionMembers = new InjectionMember[] { injectionFactory };
-            var registration = new ContainerRegistration(_validators, type, manager, injectionMembers);
+            var members = new InjectionMember[] { injectionFactory };
+            var registration = new ContainerRegistration(_validators, type, manager, members);
             if (manager is ContainerControlledLifetimeManager lifeteime) lifeteime.Scope = container;
 
             // Add or replace existing 
@@ -210,7 +210,7 @@ namespace Unity
             // Check what strategies to run
             registration.BuildChain = _strategiesChain.ToArray()
                                                       .Where(strategy => strategy.RequiredToBuildType(this,
-                                                          type, registration, injectionMembers))
+                                                          type, registration, members))
                                                       .ToArray();
             // Raise event
             container.Registering?.Invoke(this, new RegisterEventArgs(type, type, name, manager));

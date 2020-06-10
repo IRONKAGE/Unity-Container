@@ -48,7 +48,7 @@ namespace Unity
                 var lifetime = factory.Get(typeof(LifetimeManager));
                 if (lifetime is IFactoryLifetimeManager ManagerFactory)
                 {
-                    var manager = ManagerFactory.CreateLifetimePolicy();
+                    var manager = ManagerFactory.Clone();
                     registration.Set(typeof(LifetimeManager), manager);
                 }
             }

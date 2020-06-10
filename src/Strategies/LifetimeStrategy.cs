@@ -50,7 +50,7 @@ namespace Unity.Strategies
                     policy = (LifetimeManager)context.Registration.Get(typeof(LifetimeManager));
                     if (null == policy)
                     {
-                        policy = manager.CreateLifetimePolicy();
+                        policy = manager.Clone();
                         context.Registration.Set(typeof(LifetimeManager), policy);
 
                         if (policy is IDisposable)
