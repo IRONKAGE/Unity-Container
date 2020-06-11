@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Unity.Builder;
@@ -23,12 +22,8 @@ namespace Unity.Processors
 
         #region Overrides
 
-        protected override IEnumerable<FieldInfo> DeclaredMembers(Type type)
-        {
-            return type.GetDeclaredFields()
-                       .Where(member => !member.IsFamily && !member.IsPrivate &&
-                                        !member.IsInitOnly && !member.IsStatic);
-        }
+        protected override IEnumerable<FieldInfo> DeclaredMembers(Type type) => 
+            type.SupportedFields();
 
         protected override Type MemberType(FieldInfo info) => info.FieldType;
 

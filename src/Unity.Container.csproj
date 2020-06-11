@@ -21,32 +21,22 @@
     <TargetFrameworks>netstandard2.1;netstandard2.0;netstandard1.0;netcoreapp3.0;netcoreapp2.0;netcoreapp1.0;net48;net47;net46;net45;net40</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp1.0' AND '$(TargetFramework)' != 'netstandard1.0' ">
-    <Compile Remove="Policy\Converter.cs" />
+  <ItemGroup>
+    <Compile Condition="'$(TargetFramework)' != 'netcoreapp1.0' AND '$(TargetFramework)' != 'netstandard1.0' " Remove="Policy\Converter.cs" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' != 'netstandard1.0' ">
-    <Compile Remove="Utility\ConcurrentDictionary.cs" />
+  <ItemGroup>
+    <Compile Condition="'$(TargetFramework)' != 'netstandard1.0' " Remove="Utility\ConcurrentDictionary.cs" />
+    <Compile Condition="'$(TargetFramework)' == 'netstandard1.0' " Remove="Extensions\Diagnostic.cs" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != '' AND $(TargetFramework.StartsWith('netcoreapp'))">
-    <Compile Remove="Exceptions\IllegalInjectionMethodException.Desktop.cs" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' != '' AND $(TargetFramework.StartsWith('netstandard'))">
-    <Compile Remove="Exceptions\IllegalInjectionMethodException.Desktop.cs" />
+  <ItemGroup>
+    <Compile Condition="$(TargetFramework.StartsWith('netcoreapp'))" Remove="Exceptions\IllegalInjectionMethodException.Desktop.cs" />
+    <Compile Condition="$(TargetFramework.StartsWith('netstandard'))" Remove="Exceptions\IllegalInjectionMethodException.Desktop.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Unity.Container.csproj.DotSettings" />
-  </ItemGroup>
-
-  <ItemGroup Condition="Exists('$(UnityAbstractions)')">
-    <ProjectReference Include="$(UnityAbstractions)" />
-  </ItemGroup>
-
-  <ItemGroup Condition="!Exists('$(UnityAbstractions)')">
-    <PackageReference Include="Unity.Abstractions" Version="$(UnityAbstractionsVersion)" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -80,9 +70,9 @@
 
   <!-- References -->
 
-  <PropertyGroup>
-    <UnityAbstractions>..\..\Abstractions\src\Unity.Abstractions.csproj</UnityAbstractions>
-  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Abstractions\src\Unity.Abstractions.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Condition="'$(TargetFramework)' != 'net40' " Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" />

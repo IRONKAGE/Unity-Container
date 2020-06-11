@@ -71,12 +71,8 @@ namespace Unity.Processors
             return new[] { SelectMethod(type, constructors) };
         }
 
-        protected override IEnumerable<ConstructorInfo> DeclaredMembers(Type type)
-        {
-            return type.GetTypeInfo()
-                       .DeclaredConstructors
-                       .Where(ctor => !ctor.IsFamily && !ctor.IsPrivate && !ctor.IsStatic);
-        }
+        protected override IEnumerable<ConstructorInfo> DeclaredMembers(Type type) => 
+            type.SupportedConstructors();
 
         #endregion
 

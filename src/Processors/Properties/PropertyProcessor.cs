@@ -24,20 +24,8 @@ namespace Unity.Processors
 
         protected override Type MemberType(PropertyInfo info) => info.PropertyType;
 
-        protected override IEnumerable<PropertyInfo> DeclaredMembers(Type type)
-        {
-            foreach (var member in type.GetDeclaredProperties())
-            {
-                if (!member.CanWrite || 0 != member.GetIndexParameters().Length)
-                    continue;
-
-                var setter = member.GetSetMethod(true);
-                if (setter.IsPrivate || setter.IsFamily)
-                    continue;
-
-                yield return member;
-            }
-        }
+        protected override IEnumerable<PropertyInfo> DeclaredMembers(Type type) =>
+            type.SupportedProperties();
 
         #endregion
 

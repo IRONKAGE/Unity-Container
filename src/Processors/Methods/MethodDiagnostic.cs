@@ -40,7 +40,8 @@ namespace Unity.Processors
             }
 
             // Select Attributed members
-            foreach (var member in type.GetDeclaredMethods())
+            foreach (var member in type.GetMethods(BindingFlags.Public   | BindingFlags.NonPublic | 
+                                                   BindingFlags.Instance | BindingFlags.Static))
             {
                 for (var i = 0; i < AttributeFactories.Length; i++)
                 {

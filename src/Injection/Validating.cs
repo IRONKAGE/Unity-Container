@@ -45,7 +45,7 @@ namespace Unity.Injection
                 if (method.IsInitialized) throw new InvalidOperationException("Sharing an InjectionMethod between registrations is not supported");
 
                 // Select Method
-                foreach (var info in type.GetDeclaredMethods())
+                foreach (var info in type.SupportedMethods())
                 {
                     if (method.Name != info.Name || !method.Data.MatchMemberInfo(info)) continue;
 
@@ -112,7 +112,7 @@ namespace Unity.Injection
                     "Sharing an InjectionField between registrations is not supported");
 
                 // Select Field
-                foreach (var info in type.GetDeclaredFields())
+                foreach (var info in type.SupportedFields())
                 {
                     if (info.Name != field.Name) continue;
 
@@ -161,7 +161,7 @@ namespace Unity.Injection
                 if (property.IsInitialized) throw new InvalidOperationException("Sharing an InjectionProperty between registrations is not supported");
 
                 // Select Property
-                foreach (var info in type.GetDeclaredProperties())
+                foreach (var info in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
                 {
                     if (info.Name != property.Name) continue;
 
