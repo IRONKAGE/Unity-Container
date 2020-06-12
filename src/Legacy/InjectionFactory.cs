@@ -97,6 +97,11 @@ namespace Unity.Injection
             }
         }
 
+        public override void Validate(Type type)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override string ToString(bool debug = false)
         {
             throw new NotImplementedException();
