@@ -11,7 +11,7 @@ namespace Unity.Tests.v5.Generics
         [TestMethod]
         public void MatchesArrayOfGenericTypeOnly()
         {
-            var parameterValue = (IEquatable<Type>)new GenericResolvedArrayParameter("T");
+            var parameterValue = (IMatch<Type>)new GenericResolvedArrayParameter("T");
 
             Type genericTypeT
                 = this.GetType().GetTypeInfo().GetDeclaredMethod("GetT")
@@ -20,13 +20,13 @@ namespace Unity.Tests.v5.Generics
                 = this.GetType().GetTypeInfo().GetDeclaredMethod("GetU")
                     .GetGenericArguments()[0];
 
-            Assert.IsFalse(parameterValue.Equals(genericTypeT));
-            Assert.IsFalse(parameterValue.Equals(genericTypeU));
-            Assert.IsFalse(parameterValue.Equals(typeof(object)));
-            Assert.IsTrue( parameterValue.Equals(genericTypeT.MakeArrayType(1)));
-            Assert.IsFalse(parameterValue.Equals(genericTypeT.MakeArrayType(2)));
-            Assert.IsFalse(parameterValue.Equals(genericTypeU.MakeArrayType(1)));
-            Assert.IsFalse(parameterValue.Equals(typeof(object[])));
+            Assert.IsFalse(parameterValue.Match(genericTypeT));
+            Assert.IsFalse(parameterValue.Match(genericTypeU));
+            Assert.IsFalse(parameterValue.Match(typeof(object)));
+            Assert.IsTrue( parameterValue.Match(genericTypeT.MakeArrayType(1)));
+            Assert.IsFalse(parameterValue.Match(genericTypeT.MakeArrayType(2)));
+            Assert.IsFalse(parameterValue.Match(genericTypeU.MakeArrayType(1)));
+            Assert.IsFalse(parameterValue.Match(typeof(object[])));
         }
 
         [TestMethod]

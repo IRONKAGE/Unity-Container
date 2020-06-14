@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Unity.Injection;
 
 namespace Unity.Resolution
 {
@@ -11,9 +12,9 @@ namespace Unity.Resolution
     /// </summary>
     [Obsolete("This type has been deprecated as degrading performance. Use ResolverOverride.OnType() instead.", false)]
     public class TypeBasedOverride : ResolverOverride,
-                                     IEquatable<ParameterInfo>,
-                                     IEquatable<PropertyInfo>,
-                                     IEquatable<FieldInfo>
+                                     IMatch<ParameterInfo>,
+                                     IMatch<PropertyInfo>,
+                                     IMatch<FieldInfo>
     {
         #region Constructors
 
@@ -43,22 +44,22 @@ namespace Unity.Resolution
             return Value.Equals(obj);
         }
 
-        public bool Equals(FieldInfo other)
+        public bool Match(FieldInfo other)
         {
-            return Value is IEquatable<FieldInfo> info &&
-                   info.Equals(other);
+            return Value is IMatch<FieldInfo> info &&
+                   info.Match(other);
         }
 
-        public bool Equals(PropertyInfo other)
+        public bool Match(PropertyInfo other)
         {
-            return Value is IEquatable<PropertyInfo> info && 
-                   info.Equals(other);
+            return Value is IMatch<PropertyInfo> info && 
+                   info.Match(other);
         }
 
-        public bool Equals(ParameterInfo other)
+        public bool Match(ParameterInfo other)
         {
-            return Value is IEquatable<ParameterInfo> info && 
-                   info.Equals(other);
+            return Value is IMatch<ParameterInfo> info && 
+                   info.Match(other);
         }
 
         #endregion

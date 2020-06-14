@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security;
 using Unity.Exceptions;
+using Unity.Injection;
 using Unity.Lifetime;
 using Unity.Policy;
 using Unity.Registration;
@@ -55,7 +56,7 @@ namespace Unity.Builder
                     var resolverOverride = Overrides[index];
                     // If matches with current parameter
                     if (resolverOverride is IResolve resolverPolicy &&
-                        resolverOverride is IEquatable<NamedType> comparer && comparer.Equals(namedType))
+                        resolverOverride is IMatch<NamedType> comparer && comparer.Match(namedType))
                     {
                         var context = this;
 
@@ -191,7 +192,7 @@ namespace Unity.Builder
                     var resolverOverride = Overrides[index];
 
                     // If matches with current parameter
-                    if (resolverOverride is IEquatable<ParameterInfo> comparer && comparer.Equals(parameter))
+                    if (resolverOverride is IMatch<ParameterInfo> comparer && comparer.Match(parameter))
                     {
                         // Check if itself is a value 
                         if (resolverOverride is IResolve resolverPolicy)
@@ -236,7 +237,7 @@ namespace Unity.Builder
                     var resolverOverride = Overrides[index];
 
                     // Check if this parameter is overridden
-                    if (resolverOverride is IEquatable<PropertyInfo> comparer && comparer.Equals(property))
+                    if (resolverOverride is IMatch<PropertyInfo> comparer && comparer.Match(property))
                     {
                         // Check if itself is a value 
                         if (resolverOverride is IResolve resolverPolicy)
@@ -291,7 +292,7 @@ namespace Unity.Builder
                     var resolverOverride = Overrides[index];
 
                     // Check if this parameter is overridden
-                    if (resolverOverride is IEquatable<FieldInfo> comparer && comparer.Equals(field))
+                    if (resolverOverride is IMatch<FieldInfo> comparer && comparer.Match(field))
                     {
                         // Check if itself is a value 
                         if (resolverOverride is IResolve resolverPolicy)
