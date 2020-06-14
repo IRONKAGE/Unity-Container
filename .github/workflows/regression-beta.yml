@@ -18,6 +18,10 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      PackageOutputPath: '${{ github.workspace }}\package'
+      containerProject:  '${{ github.workspace }}\Container\src\Unity.Container.csproj'
+
     steps:
     - name: Checkout
       uses: actions/checkout@v2
