@@ -15,7 +15,7 @@ namespace Unity.Injection
                 if (ctor.IsInitialized) throw new InvalidOperationException("Sharing an InjectionConstructor between registrations is not supported");
 
                 // Select Constructor
-                foreach (var info in ctor.DeclaredMembers(type))
+                foreach (var info in type.SupportedConstructors())
                 {
                     if (!ctor.Data.MatchMemberInfo(info)) continue;
 
