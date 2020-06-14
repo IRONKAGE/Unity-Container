@@ -38,7 +38,7 @@ jobs:
         dotnet remove ${{ env.containerProject }} reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
         dotnet add ${{ env.containerProject }} package GitVersionTask
         dotnet add ${{ env.containerProject }} package Microsoft.SourceLink.GitHub
-        dotnet add ${{ env.containerProject }} package Unity.Abstractions --version *-beta*
+        dotnet add ${{ env.containerProject }} package Unity.Abstractions --version *-beta*\*
 
     - name: Build
       run: | 
