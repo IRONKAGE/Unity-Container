@@ -11,11 +11,10 @@ on:
 jobs:
 
   build:
-    # runs-on: windows-latest
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
-      PackageOutputPath: '${{ github.workspace }}/package'
-      containerProject:  '${{ github.workspace }}/src/Unity.Container.csproj'
+      PackageOutputPath: '${{ github.workspace }}\package'
+      containerProject:  '${{ github.workspace }}\src\Unity.Container.csproj'
 
     steps:
 
