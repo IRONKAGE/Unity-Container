@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PackageOutputPath: '${{ github.workspace }}\package'
-      containerProject:  '${{ github.workspace }}\Container\src\Unity.Container.csproj'
+      containerProject:  'src\Container\src\Unity.Container.csproj'
 
     steps:
 
