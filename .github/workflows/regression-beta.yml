@@ -6,9 +6,6 @@ name: Regression Tests
 on:
   push:
     branches:
-      - 'master'
-      - 'develop'
-      - 'hotfix/**'    
       - 'release/**'    
     # paths:
     #   - 'src/*'
@@ -34,12 +31,17 @@ jobs:
         path: '${{ github.workspace }}\Container\src\bin\Release'
         key: ${{ github.sha }}
 
+    - name: Setup local NuGet source
+      run: dotnet nuget add source "https://nuget.pkg.github.com/unitycontainer/index.json" -n github -u unitycontainer -p ${{secrets.GITHUB_TOKEN}} --store-password-in-clear-text
+
+    - name: Add Unity.Abstractions
+      run: | 
+        dotnet remove ${{ env.containerProject }} reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
+        dotnet add ${{ env.containerProject }} package Unity.Abstractions --version *-beta*
+
     - name: Build
-      env:
-        PackageVersion: '0.0.0'
       run: dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True Container\src
 
-  # TODO: add net40
 
   net:
     needs: [ Build ]
