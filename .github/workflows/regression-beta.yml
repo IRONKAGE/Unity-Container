@@ -16,36 +16,36 @@ on:
     branches: [ master, develop ]
 
 jobs:
-  build:
-    runs-on: windows-latest
-    env:
-      containerProject:  '${{ github.workspace }}\Container\src\Unity.Container.csproj'
-      PackageVersion: '0.0.0'
-      UpdateVersionProperties: 'false'
+  # build:
+  #   runs-on: windows-latest
+  #   env:
+  #     containerProject:  '${{ github.workspace }}\Container\src\Unity.Container.csproj'
+  #     PackageVersion: '0.0.0'
+  #     UpdateVersionProperties: 'false'
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        path: Container
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v2
+  #     with:
+  #       path: Container
 
-    - name: Cache
-      id: unity-container
-      uses: actions/cache@v1
-      with:
-        path: '${{ github.workspace }}/package'
-        key: ${{ github.sha }}
+  #   - name: Cache
+  #     id: unity-container
+  #     uses: actions/cache@v1
+  #     with:
+  #       path: '${{ github.workspace }}/package'
+  #       key: ${{ github.sha }}
 
-    - name: Setup local NuGet source
-      run: dotnet nuget add source "https://nuget.pkg.github.com/unitycontainer/index.json" -n github -u unitycontainer -p ${{secrets.GITHUB_TOKEN}} --store-password-in-clear-text
+  #   - name: Setup local NuGet source
+  #     run: dotnet nuget add source "https://nuget.pkg.github.com/unitycontainer/index.json" -n github -u unitycontainer -p ${{secrets.GITHUB_TOKEN}} --store-password-in-clear-text
 
-    - name: Add Unity.Abstractions
-      run: | 
-        dotnet remove ${{ env.containerProject }} reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
-        dotnet add ${{ env.containerProject }} package Unity.Abstractions --version *-beta*
+  #   - name: Add Unity.Abstractions
+  #     run: | 
+  #       dotnet remove ${{ env.containerProject }} reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
+  #       dotnet add ${{ env.containerProject }} package Unity.Abstractions --version *-beta*
 
-    - name: Build
-      run: dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True Container\src
+  #   - name: Build
+  #     run: dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True Container\src
 
 
   # net:
@@ -136,7 +136,7 @@ jobs:
 
 
   core-lts-3:
-    needs: [ Build ]
+    # needs: [ Build ]
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
@@ -174,16 +174,16 @@ jobs:
       uses: actions/cache@v1
       with:
         path: '${{ github.workspace }}/package'
-        key: ${{ github.sha }}
-        # key: ''
+        # key: ${{ github.sha }}
+        key: '6f74ecaed99ba789353d889c32a1d038278a7b27'
 
     - name: Remove Container References
       run: | 
-        dotnet remove ${{ env.UnityTests }}         reference "..\..\Container\src\Unity.Container.csproj"
-        dotnet remove ${{ env.UnitySpecTests }}     reference "..\..\Container\src\Unity.Container.csproj"
-        dotnet remove ${{ env.UnityDiagTests }}     reference "..\..\Container\src\Unity.Container.csproj"
-        dotnet remove ${{ env.SpecificationTests }} reference "..\..\Container\src\Unity.Container.csproj"
-        dotnet remove ${{ env.DiagnosticTests }}    reference "..\..\Container\src\Unity.Container.csproj"
+        dotnet remove ${{ env.UnityTests }}         reference "..\..\Unity.Container.csproj"
+        dotnet remove ${{ env.UnitySpecTests }}     reference "..\..\Unity.Container.csproj"
+        dotnet remove ${{ env.UnityDiagTests }}     reference "..\..\Unity.Container.csproj"
+        dotnet remove ${{ env.SpecificationTests }} reference "..\..\Unity.Container.csproj"
+        dotnet remove ${{ env.DiagnosticTests }}    reference "..\..\Unity.Container.csproj"
 
     - name: Setup local NuGet source
       run: dotnet nuget add source "https://nuget.pkg.github.com/unitycontainer/index.json" -n github -u unitycontainer -p ${{secrets.GITHUB_TOKEN}} --store-password-in-clear-text
