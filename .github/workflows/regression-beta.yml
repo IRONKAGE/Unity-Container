@@ -19,7 +19,6 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      PackageOutputPath: '${{ github.workspace }}\package'
       containerProject:  '${{ github.workspace }}\Container\src\Unity.Container.csproj'
 
     steps:
@@ -32,7 +31,7 @@ jobs:
       id: unity-container
       uses: actions/cache@v1
       with:
-        path: '${{ github.workspace }}\Container\src\bin\Release'
+        path: '${{ github.workspace }}/package'
         key: ${{ github.sha }}
 
     - name: Setup local NuGet source
@@ -47,90 +46,91 @@ jobs:
       run: dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True Container\src
 
 
-  net:
-    needs: [ Build ]
-    strategy:
-      matrix:
-        framework: ['net48', 'net47', 'net46', 'net45']
-    runs-on:  windows-latest
-    env:
-      TargetFramework: ${{ matrix.framework }}
+  # net:
+  #   needs: [ Build ]
+  #   strategy:
+  #     matrix:
+  #       framework: ['net48', 'net47', 'net46', 'net45']
+  #   runs-on:  windows-latest
+  #   env:
+  #     TargetFramework: ${{ matrix.framework }}
+  #     containerProject:  '${{ github.workspace }}\Container\src\Unity.Container.csproj'
 
-    steps:
-    - name: Checkout Container
-      uses: actions/checkout@v2
-      with:
-        path: Container
+  #   steps:
+  #   - name: Checkout Container
+  #     uses: actions/checkout@v2
+  #     with:
+  #       path: Container
 
-    - name: Checkout Tests
-      uses: actions/checkout@v2
-      with:
-        repository: 'unitycontainer/specification-tests'
-        path: SpecificationTests
+  #   - name: Checkout Tests
+  #     uses: actions/checkout@v2
+  #     with:
+  #       repository: 'unitycontainer/specification-tests'
+  #       path: SpecificationTests
 
-    - name: Cache
-      id: unity-container
-      uses: actions/cache@v1
-      with:
-        path: '${{ github.workspace }}\Container\src\bin\Release'
-        key: ${{ github.sha }}
+  #   - name: Cache
+  #     id: unity-container
+  #     uses: actions/cache@v1
+  #     with:
+  #       path: '${{ github.workspace }}\Container\src\bin\Release'
+  #       key: ${{ github.sha }}
   
-    - name: Build
-      run: |
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}\Container\tests\Unity.Tests\Unity.Tests.csproj
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}\Container\tests\Unity.Specification\Unity.Specification.Tests.csproj
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}\Container\tests\Unity.Diagnostic\Unity.Specification.Tests.Diagnostic.csproj
+  #   - name: Build
+  #     run: |
+  #       dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}\Container\tests\Unity.Tests\Unity.Tests.csproj
+  #       dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}\Container\tests\Unity.Specification\Unity.Specification.Tests.csproj
+  #       dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}\Container\tests\Unity.Diagnostic\Unity.Specification.Tests.Diagnostic.csproj
 
-    - name: Test
-      run: |
-        dotnet test ${{ github.workspace }}\Container\tests\Unity.Tests
-        dotnet test ${{ github.workspace }}\Container\tests\Unity.Specification
-        dotnet test ${{ github.workspace }}\Container\tests\Unity.Diagnostic
+  #   - name: Test
+  #     run: |
+  #       dotnet test ${{ github.workspace }}\Container\tests\Unity.Tests
+  #       dotnet test ${{ github.workspace }}\Container\tests\Unity.Specification
+  #       dotnet test ${{ github.workspace }}\Container\tests\Unity.Diagnostic
 
 
-  core-lts-2:
-    needs: [ Build ]
-    strategy:
-      matrix:
-        os: [windows-latest]
-    runs-on:  ${{ matrix.os }}
-    env:
-      TargetFramework: netcoreapp2.0
+  # core-lts-2:
+  #   needs: [ Build ]
+  #   strategy:
+  #     matrix:
+  #       os: [windows-latest]
+  #   runs-on:  ${{ matrix.os }}
+  #   env:
+  #     TargetFramework: netcoreapp2.0
 
-    steps:
-    - name: Checkout Container
-      uses: actions/checkout@v2
-      with:
-        path: Container
-    - name: Checkout Tests
-      uses: actions/checkout@v2
-      with:
-        repository: 'unitycontainer/specification-tests'
-        path: SpecificationTests
+  #   steps:
+  #   - name: Checkout Container
+  #     uses: actions/checkout@v2
+  #     with:
+  #       path: Container
+  #   - name: Checkout Tests
+  #     uses: actions/checkout@v2
+  #     with:
+  #       repository: 'unitycontainer/specification-tests'
+  #       path: SpecificationTests
 
-    - name: Install DotNet
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '2.1.806'
+  #   - name: Install DotNet
+  #     uses: actions/setup-dotnet@v1
+  #     with:
+  #       dotnet-version: '2.1.806'
 
-    - name: Cache
-      id: unity-container
-      uses: actions/cache@v1
-      with:
-        path: '${{ github.workspace }}/Container/src/bin/Release'
-        key: ${{ github.sha }}
+  #   - name: Cache
+  #     id: unity-container
+  #     uses: actions/cache@v1
+  #     with:
+  #       path: '${{ github.workspace }}/Container/src/bin/Release'
+  #       key: ${{ github.sha }}
 
-    - name: Build
-      run: |
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}/Container/tests/Unity.Tests/Unity.Tests.csproj
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}/Container/tests/Unity.Specification/Unity.Specification.Tests.csproj
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}/Container/tests/Unity.Diagnostic/Unity.Specification.Tests.Diagnostic.csproj
+  #   - name: Build
+  #     run: |
+  #       dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}/Container/tests/Unity.Tests/Unity.Tests.csproj
+  #       dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}/Container/tests/Unity.Specification/Unity.Specification.Tests.csproj
+  #       dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}/Container/tests/Unity.Diagnostic/Unity.Specification.Tests.Diagnostic.csproj
 
-    - name: Test
-      run: |
-        dotnet test ${{ github.workspace }}/Container/tests/Unity.Tests
-        dotnet test ${{ github.workspace }}/Container/tests/Unity.Specification
-        dotnet test ${{ github.workspace }}/Container/tests/Unity.Diagnostic
+  #   - name: Test
+  #     run: |
+  #       dotnet test ${{ github.workspace }}/Container/tests/Unity.Tests
+  #       dotnet test ${{ github.workspace }}/Container/tests/Unity.Specification
+  #       dotnet test ${{ github.workspace }}/Container/tests/Unity.Diagnostic
 
 
   core-lts-3:
@@ -140,13 +140,17 @@ jobs:
         os: [windows-latest, ubuntu-latest, macos-latest]
     runs-on:  ${{ matrix.os }}
     env:
-      TargetFramework: netcoreapp3.0
+      TargetFramework: netcoreapp3.1
+      UnityTests: ${{ github.workspace }}/Container/tests/Unity.Tests/Unity.Tests.csproj
+      SpecificationTests: ${{ github.workspace }}/Container/tests/Unity.Specification/Unity.Specification.Tests.csproj
+      DiagnosticTests: ${{ github.workspace }}/Container/tests/Unity.Diagnostic/Unity.Specification.Tests.Diagnostic.csproj
 
     steps:
     - name: Checkout Container
       uses: actions/checkout@v2
       with:
         path: Container
+
     - name: Checkout Tests
       uses: actions/checkout@v2
       with:
@@ -156,20 +160,39 @@ jobs:
     - name: Install DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.1.202'
+        dotnet-version: '3.1.300'
 
     - name: Cache
       id: unity-container
       uses: actions/cache@v1
       with:
-        path: '${{ github.workspace }}/Container/src/bin/Release'
+        path: '${{ github.workspace }}/package'
         key: ${{ github.sha }}
+
+    - name: Remove Project Reference
+      run: | 
+        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.UnityTests }}
+        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.SpecificationTests }} 
+        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.DiagnosticTests }}  
+
+        dotnet remove ${{ env.UnityTests }}         reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
+        dotnet remove ${{ env.SpecificationTests }} reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
+        dotnet remove ${{ env.DiagnosticTests }}    reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
+
+    - name: Setup local NuGet source
+      run: dotnet nuget add source "https://nuget.pkg.github.com/unitycontainer/index.json" -n github -u unitycontainer -p ${{secrets.GITHUB_TOKEN}} --store-password-in-clear-text
+
+    - name: Add Unity.Container
+      run: | 
+        dotnet add ${{ env.UnityTests }}         package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 -n
+        dotnet add ${{ env.SpecificationTests }} package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 -n
+        dotnet add ${{ env.DiagnosticTests }}    package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 -n
 
     - name: Build
       run: |
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}/Container/tests/Unity.Tests/Unity.Tests.csproj
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}/Container/tests/Unity.Specification/Unity.Specification.Tests.csproj
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ github.workspace }}/Container/tests/Unity.Diagnostic/Unity.Specification.Tests.Diagnostic.csproj
+        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.UnityTests }}
+        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.SpecificationTests }}
+        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.DiagnosticTests }}
 
     - name: Test
       run: |
