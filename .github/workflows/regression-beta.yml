@@ -20,6 +20,8 @@ jobs:
     runs-on: windows-latest
     env:
       containerProject:  '${{ github.workspace }}\Container\src\Unity.Container.csproj'
+      PackageVersion: '0.0.0'
+      UpdateVersionProperties: 'false'
 
     steps:
     - name: Checkout
@@ -138,12 +140,17 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
+
     runs-on:  ${{ matrix.os }}
     env:
       TargetFramework: netcoreapp3.1
+      PackageVersion: '0.0.0'
+      UpdateVersionProperties: 'false'
       UnityTests: ${{ github.workspace }}/Container/tests/Unity.Tests/Unity.Tests.csproj
-      SpecificationTests: ${{ github.workspace }}/Container/tests/Unity.Specification/Unity.Specification.Tests.csproj
-      DiagnosticTests: ${{ github.workspace }}/Container/tests/Unity.Diagnostic/Unity.Specification.Tests.Diagnostic.csproj
+      UnitySpecTests: ${{ github.workspace }}/Container/tests/Unity.Specification/Unity.Specification.Tests.csproj
+      UnityDiagTests: ${{ github.workspace }}/Container/tests/Unity.Diagnostic/Unity.Specification.Tests.Diagnostic.csproj
+      SpecificationTests: ${{ github.workspace }}/SpecificationTests\optimized\Unity.Specification.csproj
+      DiagnosticTests: ${{ github.workspace }}/SpecificationTests\diagnostic\Unity.Specification.Diagnostic.csproj
 
     steps:
     - name: Checkout Container
@@ -168,31 +175,32 @@ jobs:
       with:
         path: '${{ github.workspace }}/package'
         key: ${{ github.sha }}
+        # key: ''
 
-    - name: Remove Project Reference
+    - name: Remove Container References
       run: | 
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.UnityTests }}
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.SpecificationTests }} 
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.DiagnosticTests }}  
-
-        dotnet remove ${{ env.UnityTests }}         reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
-        dotnet remove ${{ env.SpecificationTests }} reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
-        dotnet remove ${{ env.DiagnosticTests }}    reference "..\..\Abstractions\src\Unity.Abstractions.csproj"
+        dotnet remove ${{ env.UnityTests }}         reference "..\..\Container\src\Unity.Container.csproj"
+        dotnet remove ${{ env.UnitySpecTests }}     reference "..\..\Container\src\Unity.Container.csproj"
+        dotnet remove ${{ env.UnityDiagTests }}     reference "..\..\Container\src\Unity.Container.csproj"
+        dotnet remove ${{ env.SpecificationTests }} reference "..\..\Container\src\Unity.Container.csproj"
+        dotnet remove ${{ env.DiagnosticTests }}    reference "..\..\Container\src\Unity.Container.csproj"
 
     - name: Setup local NuGet source
       run: dotnet nuget add source "https://nuget.pkg.github.com/unitycontainer/index.json" -n github -u unitycontainer -p ${{secrets.GITHUB_TOKEN}} --store-password-in-clear-text
 
-    - name: Add Unity.Container
+    - name: Add Unity.Container package
       run: | 
-        dotnet add ${{ env.UnityTests }}         package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 -n
-        dotnet add ${{ env.SpecificationTests }} package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 -n
-        dotnet add ${{ env.DiagnosticTests }}    package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 -n
+        dotnet add ${{ env.UnityTests }}         package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
+        dotnet add ${{ env.UnitySpecTests }}     package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
+        dotnet add ${{ env.UnityDiagTests }}     package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
+        dotnet add ${{ env.SpecificationTests }} package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
+        dotnet add ${{ env.DiagnosticTests }}    package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
 
     - name: Build
       run: |
         dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.UnityTests }}
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.SpecificationTests }}
-        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.DiagnosticTests }}
+        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.UnitySpecTests }}
+        dotnet msbuild -property:Configuration=Release -verbosity:m -restore:True ${{ env.UnityDiagTests }}
 
     - name: Test
       run: |
