@@ -190,11 +190,11 @@ jobs:
 
     - name: Add Unity.Container package
       run: | 
-        dotnet add ${{ env.UnityTests }}         package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
-        dotnet add ${{ env.UnitySpecTests }}     package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
-        dotnet add ${{ env.UnityDiagTests }}     package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
-        dotnet add ${{ env.SpecificationTests }} package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
-        dotnet add ${{ env.DiagnosticTests }}    package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0 --no-restore
+        dotnet add ${{ env.UnityTests }}         package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0
+        dotnet add ${{ env.UnitySpecTests }}     package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0
+        dotnet add ${{ env.UnityDiagTests }}     package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0
+        dotnet add ${{ env.SpecificationTests }} package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0
+        dotnet add ${{ env.DiagnosticTests }}    package --source '${{ github.workspace }}/package' Unity.Container --version 0.0.0
 
     - name: Build
       run: |
