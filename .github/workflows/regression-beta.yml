@@ -149,8 +149,8 @@ jobs:
       UnityTests: ${{ github.workspace }}/Container/tests/Unity.Tests/Unity.Tests.csproj
       UnitySpecTests: ${{ github.workspace }}/Container/tests/Unity.Specification/Unity.Specification.Tests.csproj
       UnityDiagTests: ${{ github.workspace }}/Container/tests/Unity.Diagnostic/Unity.Specification.Tests.Diagnostic.csproj
-      SpecificationTests: ${{ github.workspace }}/SpecificationTests\optimized\Unity.Specification.csproj
-      DiagnosticTests: ${{ github.workspace }}/SpecificationTests\diagnostic\Unity.Specification.Diagnostic.csproj
+      SpecificationTests: ${{ github.workspace }}/SpecificationTests/optimized/Unity.Specification.csproj
+      DiagnosticTests: ${{ github.workspace }}/SpecificationTests/diagnostic/Unity.Specification.Diagnostic.csproj
 
     steps:
     - name: Checkout Container
