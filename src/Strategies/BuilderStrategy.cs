@@ -73,11 +73,7 @@ namespace Unity.Strategies
         {
             return (TPolicyInterface)
             (context.Get(context.RegistrationType, context.Name, typeof(TPolicyInterface)) ?? (
-#if NETCOREAPP1_0 || NETSTANDARD1_0
-                context.RegistrationType.GetTypeInfo().IsGenericType
-#else
-                context.RegistrationType.IsGenericType
-#endif
+                context.RegistrationType.IsGenericType()
                 ? context.Get(context.RegistrationType.GetGenericTypeDefinition(), context.Name, typeof(TPolicyInterface)) ?? 
                     context.Get(null, null, typeof(TPolicyInterface))
                 : context.Get(null, null, typeof(TPolicyInterface))));

@@ -22,7 +22,7 @@ namespace Unity.Processors
                         object value = DependencyAttribute.Instance; 
                         foreach (var node in AttributeFactories)
                         {
-                            var attribute = GetCustomAttribute(info, node.Type);
+                            var attribute = info.GetCustomAttribute(node.Type);
                             if (null == attribute) continue;
 
                             value = null == node.Factory ? (object)attribute : node.Factory(attribute, info, null);
@@ -34,8 +34,9 @@ namespace Unity.Processors
                     
                         // Injection Member
                     case InjectionMember<TMemberInfo, TData> injectionMember:
-                        yield return GetResolverExpression(injectionMember.MemberInfo(type), 
-                                                           injectionMember.Data);
+                        TMemberInfo selection = injectionMember.MemberInfo(type) ??
+                                                                MemberInfo(injectionMember, type);
+                        yield return GetResolverExpression(selection, injectionMember.Data);
                         break;
 
                     // Unknown

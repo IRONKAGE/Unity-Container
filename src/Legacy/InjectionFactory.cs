@@ -1,5 +1,7 @@
 ﻿using System;
+using Unity.Builder;
 using Unity.Lifetime;
+using Unity.Policy;
 using Unity.Resolution;
 
 namespace Unity.Injection
@@ -11,7 +13,7 @@ namespace Unity.Injection
     /// </summary>
     /// <remarks>This factory allow using predefined <code>Func&lt;IUnityContainer, Type, string, object&gt;</code> to create types.</remarks>
     [Obsolete("InjectionFactory has been deprecated and will be removed in next release. Please use IUnityContainer.RegisterFactory(...) method instead.", false)]
-    public class InjectionFactory : InjectionMember
+    public class InjectionFactory : InjectionMember, IAddPolicies
     {
         #region Fields
 
@@ -50,50 +52,36 @@ namespace Unity.Injection
 
         #region InjectionMember
 
-        /// <summary>
-        /// Add policies to the <paramref name="policies"/> to configure the
-        /// container to call this constructor with the appropriate parameter values.
-        /// </summary>
-        /// <param name="registeredType">Type of interface being registered. If no interface,
-        /// this will be null. This parameter is ignored in this implementation.</param>
-        /// <param name="mappedToType">Type of concrete type being registered.</param>
-        /// <param name="name">Name used to resolve the type object.</param>
-        /// <param name="policies">Policy list to add policies to.</param>
-        public override void AddPolicies<TContext, TPolicySet>(Type registeredType, Type mappedToType, string name, ref TPolicySet policies)
+        public void AddPolicies<TPolicySet>(Type type, string name, ref TPolicySet policies) where TPolicySet : IPolicySet
         {
-            // Verify
-            if (null != mappedToType && mappedToType != registeredType)
-                throw new InvalidOperationException(
-                    "Registration where both MappedToType and InjectionFactory are set is not supported");
-
             // Check if Per Resolve lifetime is required
             var lifetime = policies.Get(typeof(LifetimeManager));
             if (lifetime is PerResolveLifetimeManager)
             {
-                policies.Set(typeof(ResolveDelegate<TContext>), CreatePerResolveLegacyPolicy());
+                policies.Set(typeof(ResolveDelegate<BuilderContext>), CreatePerResolveLegacyPolicy());
             }
             else
             {
-                policies.Set(typeof(ResolveDelegate<TContext>), CreateLegacyPolicy());
+                policies.Set(typeof(ResolveDelegate<BuilderContext>), CreateLegacyPolicy());
             }
 
             // Factory methods
 
-            ResolveDelegate<TContext> CreateLegacyPolicy()
+            ResolveDelegate<BuilderContext> CreateLegacyPolicy()
             {
-                return (ref TContext c) => _factoryFunc(c.Container, c.Type, c.Name);
+                return (ref BuilderContext c) => _factoryFunc(c.Container, c.Type, c.Name);
             }
 
-            ResolveDelegate<TContext> CreatePerResolveLegacyPolicy() 
+            ResolveDelegate<BuilderContext> CreatePerResolveLegacyPolicy()
             {
-                return (ref TContext context) =>
+                return (ref BuilderContext context) =>
                 {
                     var result = _factoryFunc(context.Container, context.Type, context.Name);
                     var perBuildLifetime = new InternalPerResolveLifetimeManager(result);
 
                     context.Set(context.Type, context.Name, typeof(LifetimeManager), perBuildLifetime);
                     return result;
-                }; 
+                };
             }
         }
 

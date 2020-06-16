@@ -32,7 +32,8 @@ namespace Unity.Processors
                     break;
 
                 case MethodBase<ConstructorInfo> injectionMember:
-                    info = injectionMember.MemberInfo(type);
+                    info = injectionMember.MemberInfo(type) ??
+                                           MemberInfo(injectionMember, type);
                     resolvers = injectionMember.Data;
                     break;
 

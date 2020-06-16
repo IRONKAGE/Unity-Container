@@ -212,7 +212,7 @@ namespace Unity.Processors
 
         protected bool CanResolve(Type type, string name)
         {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
+#if NETSTANDARD1_6 || NETCOREAPP1_0
             var info = type.GetTypeInfo();
 #else
             var info = type;
@@ -234,7 +234,7 @@ namespace Unity.Processors
                 // - No accessible constructor
                 if (DelegateType.IsAssignableFrom(info) ||
                     typeof(string) == type || info.IsEnum || info.IsPrimitive || info.IsAbstract
-#if NETSTANDARD1_0 || NETCOREAPP1_0
+#if NETSTANDARD1_6 || NETCOREAPP1_0
                     || !info.DeclaredConstructors.Any(c => !c.IsFamily && !c.IsPrivate))
 #else
                     || !type.GetTypeInfo().DeclaredConstructors.Any(c => !c.IsFamily && !c.IsPrivate))

@@ -6,6 +6,8 @@ namespace Compiled.Constructor
     [TestClass]
     public class Injection : Unity.Specification.Constructor.Injection.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -15,6 +17,8 @@ namespace Compiled.Constructor
     [TestClass]
     public class Attribute : Unity.Specification.Constructor.Attribute.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -24,6 +28,8 @@ namespace Compiled.Constructor
     [TestClass]
     public class Parameters : Unity.Specification.Constructor.Parameters.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -33,6 +39,8 @@ namespace Compiled.Constructor
     [TestClass]
     public class Overrides : Unity.Specification.Constructor.Overrides.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -46,6 +54,8 @@ namespace Resolved.Constructor
     [TestClass]
     public class Injection : Unity.Specification.Constructor.Injection.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());
@@ -55,6 +65,8 @@ namespace Resolved.Constructor
     [TestClass]
     public class Attribute : Unity.Specification.Constructor.Attribute.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());
@@ -64,6 +76,8 @@ namespace Resolved.Constructor
     [TestClass]
     public class Parameters : Unity.Specification.Constructor.Parameters.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());
@@ -73,6 +87,8 @@ namespace Resolved.Constructor
     [TestClass]
     public class Overrides : Unity.Specification.Constructor.Overrides.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());

@@ -6,6 +6,8 @@ namespace Compiled.Property
     [TestClass]
     public class Attribute : Unity.Specification.Property.Attribute.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -15,6 +17,8 @@ namespace Compiled.Property
     [TestClass]
     public class Injection : Unity.Specification.Property.Injection.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -24,6 +28,8 @@ namespace Compiled.Property
     [TestClass]
     public class Override : Unity.Specification.Property.Overrides.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -37,6 +43,8 @@ namespace Resolved.Property
     [TestClass]
     public class Attribute : Unity.Specification.Property.Attribute.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());
@@ -46,6 +54,8 @@ namespace Resolved.Property
     [TestClass]
     public class Injection : Unity.Specification.Property.Injection.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());
@@ -55,6 +65,8 @@ namespace Resolved.Property
     [TestClass]
     public class Override : Unity.Specification.Property.Overrides.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());

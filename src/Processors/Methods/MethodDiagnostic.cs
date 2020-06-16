@@ -45,11 +45,7 @@ namespace Unity.Processors
             {
                 for (var i = 0; i < AttributeFactories.Length; i++)
                 {
-#if NET40
-                    if (!member.IsDefined(AttributeFactories[i].Type, true) ||
-#else
                     if (!member.IsDefined(AttributeFactories[i].Type) ||
-#endif
                         !memberSet.Add(member)) continue;
 
                     // Validate

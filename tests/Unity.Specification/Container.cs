@@ -1,38 +1,39 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Unity;
+using Unity.Specification.Container.Hierarchy;
 
-namespace Registration
+namespace Container
 {
     [TestClass]
-    public class Types : Unity.Specification.Diagnostic.Registration.Types.SpecificationTests
+    public class Hierarchy : SpecificationTests
     {
         [TestInitialize] public override void Setup() => base.Setup();
 
         public override IUnityContainer GetContainer()
         {
-            return new UnityContainer().AddExtension(new Diagnostic());
+            return new UnityContainer();
         }
     }
 
     [TestClass]
-    public class Instance : Unity.Specification.Diagnostic.Registration.Instance.SpecificationTests
+    public class IsRegistered : SpecificationTests
     {
         [TestInitialize] public override void Setup() => base.Setup();
 
         public override IUnityContainer GetContainer()
         {
-            return new UnityContainer().AddExtension(new Diagnostic());
+            return new UnityContainer();
         }
     }
 
     [TestClass]
-    public class Factory : Unity.Specification.Diagnostic.Registration.Factory.SpecificationTests
+    public class Registrations : SpecificationTests
     {
         [TestInitialize] public override void Setup() => base.Setup();
 
         public override IUnityContainer GetContainer()
         {
-            return new UnityContainer().AddExtension(new Diagnostic());
+            return new UnityContainer();
         }
     }
 }

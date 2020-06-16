@@ -172,14 +172,14 @@ namespace Unity.Processors
 
         public virtual IEnumerable<object> Select(Type type, IPolicySet registration)
         {
-            HashSet<object> memberSet = new HashSet<object>();
+            HashSet<string> memberSet = new HashSet<string>();
 
             // Select Injected Members
             if (null != ((InternalRegistration)registration).InjectionMembers)
             {
                 foreach (var injectionMember in ((InternalRegistration)registration).InjectionMembers)
                 {
-                    if (injectionMember is InjectionMember<TMemberInfo, TData> && memberSet.Add(injectionMember))
+                    if (injectionMember is InjectionMember<TMemberInfo, TData> member && memberSet.Add(member.Name))
                         yield return injectionMember;
                 }
             }
@@ -192,12 +192,8 @@ namespace Unity.Processors
             {
                 for (var i = 0; i < AttributeFactories.Length; i++)
                 {
-#if NET40
-                    if (!member.IsDefined(AttributeFactories[i].Type, true) ||
-#else
                     if (!member.IsDefined(AttributeFactories[i].Type) || 
-#endif
-                        !memberSet.Add(member)) continue;
+                        !memberSet.Add(member.Name)) continue;
 
                     yield return member;
                     break;
@@ -232,31 +228,14 @@ namespace Unity.Processors
             return resolver;
         }
 
-        protected Attribute GetCustomAttribute(TMemberInfo info, Type type)
-        {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-            return info.GetCustomAttributes()
-                       .Where(a => a.GetType()
-                                    .GetTypeInfo()
-                                    .IsAssignableFrom(type.GetTypeInfo()))
-                       .FirstOrDefault();
-#elif NET40
-            return info.GetCustomAttributes(true)
-                       .Cast<Attribute>()
-                       .Where(a => a.GetType()
-                                    .GetTypeInfo()
-                                    .IsAssignableFrom(type.GetTypeInfo()))
-                       .FirstOrDefault();
-#else
-            return info.GetCustomAttribute(type);
-#endif
-        }
-
         public TPolicyInterface GetPolicy<TPolicyInterface>(IPolicySet registration)
         {
             return (TPolicyInterface)(registration.Get(typeof(TPolicyInterface)) ??
                                         _policySet.Get(typeof(TPolicyInterface)));
         }
+
+        protected virtual TMemberInfo MemberInfo(InjectionMember<TMemberInfo, TData> member, Type type) => 
+            throw new ArgumentException("No member info matching data has been found");
 
         #endregion
 

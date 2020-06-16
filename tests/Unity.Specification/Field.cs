@@ -6,6 +6,8 @@ namespace Compiled.Field
     [TestClass]
     public class Attribute : Unity.Specification.Field.Attribute.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -15,6 +17,8 @@ namespace Compiled.Field
     [TestClass]
     public class Injection : Unity.Specification.Field.Injection.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -25,6 +29,8 @@ namespace Compiled.Field
     [TestClass]
     public class Overrides : Unity.Specification.Field.Overrides.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceCompillation());
@@ -38,6 +44,8 @@ namespace Resolved.Field
     [TestClass]
     public class Attribute : Unity.Specification.Field.Attribute.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());
@@ -47,6 +55,8 @@ namespace Resolved.Field
     [TestClass]
     public class Injection : Unity.Specification.Field.Injection.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());
@@ -56,6 +66,8 @@ namespace Resolved.Field
     [TestClass]
     public class Overrides : Unity.Specification.Field.Overrides.SpecificationTests
     {
+        [TestInitialize] public override void Setup() => base.Setup();
+
         public override IUnityContainer GetContainer()
         {
             return new UnityContainer().AddExtension(new ForceActivation());

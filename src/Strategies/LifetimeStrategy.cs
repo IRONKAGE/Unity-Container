@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Unity.Builder;
 using Unity.Injection;
 using Unity.Lifetime;
@@ -35,11 +34,7 @@ namespace Unity.Strategies
                 policy = (LifetimeManager)context.Get(typeof(LifetimeManager));
             if (null == policy)
             {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-                if (!context.RegistrationType.GetTypeInfo().IsGenericType) return;
-#else
-                if (!context.RegistrationType.IsGenericType) return;
-#endif
+                if (!context.RegistrationType.IsGenericType()) return;
                 var manager = (LifetimeManager)context.Get(context.Type.GetGenericTypeDefinition(),
                                                            context.Name, typeof(LifetimeManager));
                 if (null == manager) return;
@@ -103,13 +98,9 @@ namespace Unity.Strategies
             }
 
             // Dynamic registration
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-            if (!(registration is ContainerRegistration) && null != type && type.GetTypeInfo().IsGenericType)
+            if (!(registration is ContainerRegistration) && null != type && type.IsGenericType())
                 return true;
-#else
-            if (!(registration is ContainerRegistration) && null != type && type.IsGenericType)
-                return true;
-#endif
+
             return false;
         }
 

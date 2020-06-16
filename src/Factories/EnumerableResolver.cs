@@ -27,7 +27,7 @@ namespace Unity.Factories
         public static ResolveDelegateFactory Factory = (ref BuilderContext context) =>
         {
 
-#if NETSTANDARD1_0 || NETCOREAPP1_0 || NET40
+#if NETSTANDARD1_6 || NETCOREAPP1_0 || NET40
             var typeArgument = context.Type.GetTypeInfo().GenericTypeArguments.First();
             if (typeArgument.GetTypeInfo().IsGenericType)
 #else

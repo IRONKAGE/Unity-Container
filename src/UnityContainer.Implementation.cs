@@ -211,7 +211,7 @@ namespace Unity
             // Registration Validator
             container.TypeValidator = (typeFrom, typeTo) =>
             {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
+#if NETSTANDARD1_6 || NETCOREAPP1_0
                 var infoFrom = typeFrom.GetTypeInfo();
                 var infoTo = typeTo.GetTypeInfo();
 
@@ -225,7 +225,7 @@ namespace Unity
                     throw new ArgumentException($"The type {typeTo} cannot be assigned to variables of type {typeFrom}.");
                 }
 
-#if NETSTANDARD1_0 || NETCOREAPP1_0
+#if NETSTANDARD1_6 || NETCOREAPP1_0
                 if (null != typeFrom && null != typeTo && infoFrom.IsGenericType && infoTo.IsArray && 
                     infoFrom.GetGenericTypeDefinition() == typeof(IEnumerable<>))
 #else
@@ -235,7 +235,7 @@ namespace Unity
                     throw new ArgumentException($"Type mapping of IEnumerable<T> to array T[] is not supported.");
 
 
-#if NETSTANDARD1_0 || NETCOREAPP1_0
+#if NETSTANDARD1_6 || NETCOREAPP1_0
                 if (null == typeFrom && infoTo.IsInterface)
 #else
                 if (null == typeFrom && typeTo.IsInterface)

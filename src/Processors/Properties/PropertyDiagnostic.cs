@@ -26,14 +26,14 @@ namespace Unity.Processors
 
         public override IEnumerable<object> Select(Type type, IPolicySet registration)
         {
-            HashSet<object> memberSet = new HashSet<object>();
+            HashSet<string> memberSet = new HashSet<string>();
 
             // Select Injected Members
             if (null != ((InternalRegistration)registration).InjectionMembers)
             {
                 foreach (var injectionMember in ((InternalRegistration)registration).InjectionMembers)
                 {
-                    if (injectionMember is InjectionMember<PropertyInfo, object> && memberSet.Add(injectionMember))
+                    if (injectionMember is InjectionMember<PropertyInfo, object> member && memberSet.Add(member.Name))
                         yield return injectionMember;
                 }
             }
@@ -49,7 +49,7 @@ namespace Unity.Processors
 #else
                     if (!member.IsDefined(AttributeFactories[i].Type) ||
 #endif
-                        !memberSet.Add(member)) continue;
+                        !memberSet.Add(member.Name)) continue;
 
                     if (!member.CanWrite)
                         throw new InvalidOperationException(

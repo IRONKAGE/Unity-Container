@@ -193,13 +193,7 @@ namespace Unity
         /// <returns>The requested extension's configuration interface, or null if not found.</returns>
         public object Configure(Type configurationInterface)
         {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-            return _extensions?.FirstOrDefault(ex => configurationInterface.GetTypeInfo()
-                                                                           .IsAssignableFrom(ex.GetType()
-                                                                           .GetTypeInfo()));
-#else
             return _extensions?.FirstOrDefault(ex => configurationInterface.IsAssignableFrom(ex.GetType()));
-#endif
         }
 
         #endregion

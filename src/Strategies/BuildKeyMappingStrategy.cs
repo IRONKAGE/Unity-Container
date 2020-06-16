@@ -22,7 +22,7 @@ namespace Unity.Strategies
             if (null == containerRegistration.Type || type == containerRegistration.Type) return false;
 
             // Set mapping policy
-#if NETSTANDARD1_0 || NETCOREAPP1_0
+#if NETSTANDARD1_6 || NETCOREAPP1_0
             if (type.GetTypeInfo().IsGenericTypeDefinition && 
                 containerRegistration.Type.GetTypeInfo().IsGenericTypeDefinition && 
                 null == containerRegistration.Map)
@@ -32,7 +32,7 @@ namespace Unity.Strategies
             {
                 containerRegistration.Map = (Type t) =>
                 {
-#if NETSTANDARD1_0 || NETCOREAPP1_0 || NET40
+#if NETSTANDARD1_6 || NETCOREAPP1_0 || NET40
                     var targetTypeInfo = t.GetTypeInfo();
 #else
                     var targetTypeInfo = t;

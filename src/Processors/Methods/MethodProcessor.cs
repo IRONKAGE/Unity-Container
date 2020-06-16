@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Unity.Builder;
 using Unity.Exceptions;
+using Unity.Injection;
 using Unity.Policy;
 using Unity.Resolution;
 
@@ -66,6 +67,25 @@ namespace Unity.Processors
 
                 return c.Existing;
             };
+        }
+
+        #endregion
+
+
+        #region Injection
+
+        protected override MethodInfo MemberInfo(InjectionMember<MethodInfo, object[]> member, Type type)
+        {
+            if (null == member.Data || 0 == member.Data.Length)
+            {
+                foreach (var method in DeclaredMembers(type))
+                {
+                    if (method.Name == member.Name)
+                        return method;
+                }
+            }
+
+            return base.MemberInfo(member, type);
         }
 
         #endregion

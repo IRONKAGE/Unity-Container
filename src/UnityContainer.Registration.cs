@@ -106,17 +106,11 @@ namespace Unity
             if (null != defaultRegistration) return true;
             if (null != noNameRegistration) return true;
 
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-            var info = type.GetTypeInfo();
-            if (!info.IsGenericType) return false;
-
-            type = info.GetGenericTypeDefinition();
-#else
-            if (!type?.IsGenericType ?? false) return false;
+            if (!type?.IsGenericType() ?? false) return false;
 
             type = type?.GetGenericTypeDefinition();
-#endif
             hashCode = (type?.GetHashCode() ?? 0) & 0x7FFFFFFF;
+
             for (var container = this; null != container; container = container._parent)
             {
                 if (null == container._registrations) continue;

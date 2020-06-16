@@ -65,8 +65,10 @@ namespace Unity
                 {
                     foreach (var member in injectionMembers)
                     {
-                        member.AddPolicies<BuilderContext, ContainerRegistration>(
-                            registeredType, mappedToType, name, ref registration);
+                        if (member is IAddPolicies contributor)
+                        {
+                            contributor.AddPolicies(mappedToType, name, ref registration);
+                        }
                     }
                 }
 
@@ -204,8 +206,7 @@ namespace Unity
                 container.LifetimeContainer.Add(managerDisposable);
 
             // Add Injection Members
-            injectionFactory.AddPolicies<BuilderContext, ContainerRegistration>(
-                type, type, name, ref registration);
+            injectionFactory.AddPolicies(type, name, ref registration);
 
             // Check what strategies to run
             registration.BuildChain = _strategiesChain.ToArray()

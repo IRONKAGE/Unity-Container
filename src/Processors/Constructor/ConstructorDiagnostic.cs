@@ -119,11 +119,7 @@ namespace Unity.Processors
             {
                 for (var i = 0; i < AttributeFactories.Length; i++)
                 {
-#if NET40
-                    if (!constructor.IsDefined(AttributeFactories[i].Type, true))
-#else
                     if (!constructor.IsDefined(AttributeFactories[i].Type))
-#endif
                         continue;
 
                     selection.Add(constructor);
@@ -155,7 +151,7 @@ namespace Unity.Processors
 
                 if (qtd == 0)
                 {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
+#if NETSTANDARD1_6 || NETCOREAPP1_0
                     return b.GetParameters().Sum(p => p.ParameterType.GetTypeInfo().IsInterface ? 1 : 0)
                         .CompareTo(a.GetParameters().Sum(p => p.ParameterType.GetTypeInfo().IsInterface ? 1 : 0));
 #else
@@ -210,7 +206,7 @@ namespace Unity.Processors
 
         public override IEnumerable<Expression> GetExpressions(Type type, IPolicySet registration)
         {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
+#if NETSTANDARD1_6 || NETCOREAPP1_0
             var typeInfo = type.GetTypeInfo();
 #else
             var typeInfo = type;
@@ -280,7 +276,7 @@ namespace Unity.Processors
 
         public override ResolveDelegate<BuilderContext> GetResolver(Type type, IPolicySet registration, ResolveDelegate<BuilderContext> seed)
         {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
+#if NETSTANDARD1_6 || NETCOREAPP1_0
             var typeInfo = type.GetTypeInfo();
 #else
             var typeInfo = type;

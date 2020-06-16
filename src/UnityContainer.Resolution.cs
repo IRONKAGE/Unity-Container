@@ -97,11 +97,7 @@ namespace Unity
             {
                 try
                 {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-                    if (set[i].RegisteredType.GetTypeInfo().IsGenericTypeDefinition)
-#else
-                    if (set[i].RegisteredType.IsGenericTypeDefinition)
-#endif
+                    if (set[i].RegisteredType.IsGenericTypeDefinition())
                     {
                         var registration = (InternalRegistration)GetRegistration(typeof(TElement), set[i].Name);
                         value = (TElement)resolve(typeof(TElement), set[i].Name, registration);
@@ -145,11 +141,7 @@ namespace Unity
             {
                 try
                 {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-                    if (set[i].RegisteredType.GetTypeInfo().IsGenericTypeDefinition)
-#else
-                    if (set[i].Registration is ContainerRegistration && set[i].RegisteredType.IsGenericTypeDefinition)
-#endif
+                    if (set[i].Registration is ContainerRegistration && set[i].RegisteredType.IsGenericTypeDefinition())
                     {
                         var registration = (InternalRegistration)GetRegistration(typeof(TElement), set[i].Name);
                         value = (TElement)resolve(typeof(TElement), set[i].Name, registration);
@@ -188,11 +180,7 @@ namespace Unity
         internal static object ResolveArray<TElement>(ref BuilderContext context)
         {
             var type = typeof(TElement);
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-            var generic = type.GetTypeInfo().IsGenericType ? type.GetGenericTypeDefinition() : type;
-#else
-            var generic = type.IsGenericType ? type.GetGenericTypeDefinition() : type;
-#endif
+            var generic = type.IsGenericType() ? type.GetGenericTypeDefinition() : type;
             var set = generic == type ? GetNamedRegistrations((UnityContainer)context.Container, type)
                                       : GetNamedRegistrations((UnityContainer)context.Container, type, generic);
             return ResolveRegistrations<TElement>(ref context, set).ToArray();
@@ -207,11 +195,7 @@ namespace Unity
                 ref var entry = ref registrations[i];
                 try
                 {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-                    if (entry.RegisteredType.GetTypeInfo().IsGenericTypeDefinition)
-#else
-                    if (entry.RegisteredType.IsGenericTypeDefinition)
-#endif
+                    if (entry.RegisteredType.IsGenericTypeDefinition())
                         list.Add((TElement)context.Resolve(type, entry.Name));
                     else
                         list.Add((TElement)context.Resolve(type, entry.Name, entry.Registration));
@@ -233,11 +217,7 @@ namespace Unity
 
         internal static object ResolveGenericArray<TElement>(ref BuilderContext context, Type type)
         {
-#if NETSTANDARD1_0 || NETCOREAPP1_0
-            var generic = type.GetTypeInfo().IsGenericType ? type.GetGenericTypeDefinition() : type;
-#else
-            var generic = type.IsGenericType ? type.GetGenericTypeDefinition() : type;
-#endif
+            var generic = type.IsGenericType() ? type.GetGenericTypeDefinition() : type;
             var set = generic == type ? GetNamedRegistrations((UnityContainer)context.Container, type)
                                       : GetNamedRegistrations((UnityContainer)context.Container, type, generic);
 

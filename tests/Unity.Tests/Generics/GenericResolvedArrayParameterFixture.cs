@@ -102,15 +102,6 @@ namespace Unity.Tests.v5.Generics
             Assert.AreSame(a1, result.InjectedValue[1]);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void AppropriateExceptionIsThrownWhenNoMatchingConstructorCanBeFound()
-        {
-            new UnityContainer()
-                .RegisterType(typeof(ClassWithOneGenericParameter<>),
-                    new InjectionConstructor(new GenericResolvedArrayParameter("T")));
-        }
-
         private void GetT<T>() { }
         private void GetU<U>() { }
 

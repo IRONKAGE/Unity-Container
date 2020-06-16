@@ -1,27 +1,28 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Unity;
+using Unity.Specification.Factory.Registration;
 
-namespace Issues
+namespace Factory
 {
     [TestClass]
-    public class GitHub : Unity.Specification.Diagnostic.Issues.GitHub.SpecificationTests
+    public class Registration : SpecificationTests
     {
         [TestInitialize] public override void Setup() => base.Setup();
 
         public override IUnityContainer GetContainer()
         {
-            return new UnityContainer().AddNewExtension<Diagnostic>();
+            return new UnityContainer();
         }
     }
 
     [TestClass]
-    public class CodePlex : Unity.Specification.Issues.Codeplex.SpecificationTests
+    public class Resolution : SpecificationTests
     {
         [TestInitialize] public override void Setup() => base.Setup();
 
         public override IUnityContainer GetContainer()
         {
-            return new UnityContainer().AddNewExtension<Diagnostic>();
+            return new UnityContainer();
         }
     }
 }
