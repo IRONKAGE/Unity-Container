@@ -70,8 +70,8 @@ namespace Unity.Processors
                     break;
 
                 case MethodBase<ConstructorInfo> injectionMember:
-                    info = injectionMember.MemberInfo(type) ??
-                                           MemberInfo(injectionMember, type);
+                    info = GetInjectedInfo(injectionMember, type) ??
+                            throw new InvalidOperationException(NoMatchFound, new InvalidRegistrationException());
                     resolvers = injectionMember.Data;
                     parametersExpr = CreateParameterExpressions(info.GetParameters(), resolvers);
                     break;

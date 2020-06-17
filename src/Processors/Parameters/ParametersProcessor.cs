@@ -21,7 +21,6 @@ namespace Unity.Processors
         #endregion
 
 
-
         #region Constructors
 
         protected ParametersProcessor(IPolicySet policySet, Type attribute, UnityContainer container)

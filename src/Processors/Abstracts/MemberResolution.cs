@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Unity.Builder;
+using Unity.Exceptions;
 using Unity.Injection;
 using Unity.Resolution;
 
@@ -33,8 +34,8 @@ namespace Unity.Processors
 
                     // Injection Member
                     case InjectionMember<TMemberInfo, TData> injectionMember:
-                        TMemberInfo selection = injectionMember.MemberInfo(type) ??
-                                                                MemberInfo(injectionMember, type);
+                        TMemberInfo selection = GetInjectedInfo(injectionMember, type) ??
+                            throw new InvalidOperationException(NoMatchFound, new InvalidRegistrationException());
                         yield return GetResolverDelegate(selection, injectionMember.Data);
                         break;
 

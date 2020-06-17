@@ -116,5 +116,18 @@ namespace Unity.Processors
         }
 
         #endregion
+
+
+        #region Injection
+
+        protected override PropertyInfo? GetInjectedInfo(InjectionMember<PropertyInfo, object> member, Type type)
+        {
+            if (null != member.Info && member.Info.DeclaringType == type)
+                return member.Info;
+
+            return type.GetProperty(member.Name);
+        }
+
+        #endregion
     }
 }

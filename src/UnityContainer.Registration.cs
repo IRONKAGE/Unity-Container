@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using Unity.Policy;
 using Unity.Registration;
 using Unity.Storage;
@@ -24,7 +23,6 @@ namespace Unity
 
         internal IPolicySet Defaults;
         private readonly object _syncRoot = new object();
-        private  LinkedNode<Type, object> _validators;
         private Registrations _registrations;
 
         #endregion

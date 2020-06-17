@@ -199,15 +199,7 @@ namespace Unity
             container.Defaults.Set(typeof(ISelect<PropertyInfo>), propertiesProcessor);
             container.Defaults.Set(typeof(ISelect<MethodInfo>), methodsProcessor);
 
-            var validators = new InternalRegistration();
-
-            validators.Set(typeof(Func<Type, InjectionMember, ConstructorInfo>), Validating.ConstructorSelector);
-            validators.Set(typeof(Func<Type, InjectionMember, MethodInfo>), Validating.MethodSelector);
-            validators.Set(typeof(Func<Type, InjectionMember, FieldInfo>), Validating.FieldSelector);
-            validators.Set(typeof(Func<Type, InjectionMember, PropertyInfo>), Validating.PropertySelector);
-
-            container._validators = validators;
-
+            // TODO: unitycontainer/unity/issues/336
             // Registration Validator
             container.TypeValidator = (typeFrom, typeTo) =>
             {

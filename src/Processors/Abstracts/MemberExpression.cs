@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using Unity.Exceptions;
 using Unity.Injection;
 
 namespace Unity.Processors
@@ -34,8 +35,8 @@ namespace Unity.Processors
                     
                         // Injection Member
                     case InjectionMember<TMemberInfo, TData> injectionMember:
-                        TMemberInfo selection = injectionMember.MemberInfo(type) ??
-                                                                MemberInfo(injectionMember, type);
+                        TMemberInfo selection = GetInjectedInfo(injectionMember, type) ??
+                            throw new InvalidOperationException(NoMatchFound, new InvalidRegistrationException()); // TODO: Simplify exception throwing
                         yield return GetResolverExpression(selection, injectionMember.Data);
                         break;
 

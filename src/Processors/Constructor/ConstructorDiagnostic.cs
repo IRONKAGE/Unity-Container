@@ -80,31 +80,22 @@ namespace Unity.Processors
 
         public override IEnumerable<object> Select(Type type, IPolicySet registration)
         {
-            var members = new List<InjectionMember>();
+            InjectionConstructor[]? members = null;
 
             // Select Injected Members
             if (null != ((InternalRegistration)registration).InjectionMembers)
             {
-                foreach (var injectionMember in ((InternalRegistration)registration).InjectionMembers)
-                {
-                    if (injectionMember is InjectionMember<ConstructorInfo, object[]>)
-                    {
-                        members.Add(injectionMember);
-                    }
-                }
+                members = ((InternalRegistration)registration).InjectionMembers
+                                                              .OfType<InjectionConstructor>()
+                                                              .ToArray();
             }
 
-            switch (members.Count)
+            if (null != members && 0 < members.Length)
             {
-                case 1:
-                    return members.ToArray();
-
-                case 0:
-                    break;
-
-                default:
-                    return new[] { new InvalidOperationException($"Multiple Injection Constructors are registered for Type {type.FullName}", 
-                        new InvalidRegistrationException()) };
+                return 1 == members.Length
+                    ? (IEnumerable<object>)members
+                    : new[] { new InvalidOperationException($"Multiple Injection Constructors are registered for Type {type.FullName}", 
+                                new InvalidRegistrationException()) };
             }
 
             // Enumerate to array
@@ -163,7 +154,7 @@ namespace Unity.Processors
             });
 
             int parametersCount = 0;
-            ConstructorInfo bestCtor = null;
+            ConstructorInfo? bestCtor = null;
 
             foreach (var ctorInfo in constructors)
             {
@@ -197,6 +188,71 @@ namespace Unity.Processors
             }
 
             return bestCtor;
+        }
+
+        #endregion
+
+
+        #region Injection Validation
+
+        protected override ConstructorInfo GetInjectedInfo(InjectionMember<ConstructorInfo, object[]> member, Type type)
+        {
+            // Select valid constructor
+            ConstructorInfo? selection = null;
+            foreach (var ctor in DeclaredMembers(type))
+            {
+                if (!member.Match(ctor)) continue;
+
+                if (null != selection)
+                {
+                    var message = $" InjectionConstructor({member})  is ambiguous \n" +
+                        $" It could be matched with more than one constructor on type '{type.Name}': \n\n" +
+                        $"    {selection} \n    {ctor}";
+
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
+
+                selection = ctor;
+            }
+
+            // stop if found
+            if (null != selection) return selection;
+
+            // Select invalid constructor
+            foreach (var info in type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public |
+                                                      BindingFlags.Instance | BindingFlags.Static)
+                                     .Where(ctor => ctor.IsFamily || ctor.IsPrivate || ctor.IsStatic))
+            {
+                if (!member.Data.MatchMemberInfo(info)) continue;
+
+                if (info.IsStatic)
+                {
+                    var message = $" InjectionConstructor({member})  does not match any valid constructors \n" +
+                        $" It matches static constructor {info} but static constructors are not supported.";
+
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
+
+                if (info.IsPrivate)
+                {
+                    var message = $" InjectionConstructor({member})  does not match any valid constructors \n" +
+                        $" It matches private constructor {info} but private constructors are not supported.";
+
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
+
+                if (info.IsFamily)
+                {
+                    var message = $" InjectionConstructor({member})  does not match any valid constructors \n" +
+                        $" It matches protected constructor {info} but protected constructors are not supported.";
+
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"InjectionConstructor({member}) could not be matched with any constructors on type {type.Name}.", 
+                new InvalidRegistrationException());
         }
 
         #endregion
@@ -344,7 +400,7 @@ namespace Unity.Processors
                 {
                     try
                     {
-                        var dependencies = new object[parameterResolvers.Length];
+                        var dependencies = new object?[parameterResolvers.Length];
                         for (var i = 0; i < dependencies.Length; i++)
                             dependencies[i] = parameterResolvers[i](ref c);
 
@@ -364,6 +420,7 @@ namespace Unity.Processors
         protected override ResolveDelegate<BuilderContext> GetPerResolveDelegate(ConstructorInfo info, object resolvers)
         {
             var parameterResolvers = CreateDiagnosticParameterResolvers(info.GetParameters(), resolvers).ToArray();
+            
             // PerResolve lifetime
             return (ref BuilderContext c) =>
             {
@@ -371,7 +428,7 @@ namespace Unity.Processors
                 {
                     try
                     {
-                        var dependencies = new object[parameterResolvers.Length];
+                        var dependencies = new object?[parameterResolvers.Length];
                         for (var i = 0; i < dependencies.Length; i++)
                             dependencies[i] = parameterResolvers[i](ref c);
 

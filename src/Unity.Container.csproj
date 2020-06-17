@@ -8,6 +8,7 @@
     <RepositoryUrl>https://github.com/unitycontainer/container</RepositoryUrl>
     <License>https://github.com/unitycontainer/container/blob/master/LICENSE</License>
     <IconUrl>https://avatars1.githubusercontent.com/u/12849707</IconUrl>
+    <PackageTags>Unity Container unitycontainer Microsoft.Practices.Unity IoC</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Authors>Unity Open Source Project</Authors>
     <Company>Unity Open Source Project</Company>
@@ -15,9 +16,9 @@
     <AssemblyOriginatorKeyFile>package.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
     <RootNamespace>Unity</RootNamespace>
-    <PackageTags>Unity Container unitycontainer Microsoft.Practices.Unity IoC</PackageTags>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
     <TargetFrameworks>netstandard2.1;netstandard2.0;netstandard1.6;netcoreapp3.0;netcoreapp2.0;netcoreapp1.0;net48;net47;net46;net45;net40</TargetFrameworks>
   </PropertyGroup>
 

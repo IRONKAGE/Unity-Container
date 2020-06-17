@@ -74,8 +74,11 @@ namespace Unity.Processors
 
         #region Injection
 
-        protected override MethodInfo MemberInfo(InjectionMember<MethodInfo, object[]> member, Type type)
+        protected override MethodInfo? GetInjectedInfo(InjectionMember<MethodInfo, object[]> member, Type type)
         {
+            var info = base.GetInjectedInfo(member, type);
+            if (null != info) return info;
+
             if (null == member.Data || 0 == member.Data.Length)
             {
                 foreach (var method in DeclaredMembers(type))
@@ -85,7 +88,7 @@ namespace Unity.Processors
                 }
             }
 
-            return base.MemberInfo(member, type);
+            return null;
         }
 
         #endregion

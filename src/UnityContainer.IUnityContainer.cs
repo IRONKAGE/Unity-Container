@@ -43,7 +43,7 @@ namespace Unity
 
                 // Create registration and add to appropriate storage
                 var container = manager is SingletonLifetimeManager ? _root : this;
-                var registration = new ContainerRegistration(_validators, typeTo, manager, injectionMembers);
+                var registration = new ContainerRegistration(null, typeTo, manager, injectionMembers);
                 if (manager is ContainerControlledLifetimeManager lifeteime) lifeteime.Scope = container;
 
                 // Add or replace existing 
@@ -188,7 +188,7 @@ namespace Unity
             var injectionFactory = new InjectionFactory(factory);
 #pragma warning restore CS0618
             var members = new InjectionMember[] { injectionFactory };
-            var registration = new ContainerRegistration(_validators, type, manager, members);
+            var registration = new ContainerRegistration(null, type, manager, members);
             if (manager is ContainerControlledLifetimeManager lifeteime) lifeteime.Scope = container;
 
             // Add or replace existing 

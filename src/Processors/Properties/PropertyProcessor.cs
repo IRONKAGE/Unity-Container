@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using Unity.Builder;
+using Unity.Injection;
 using Unity.Policy;
 using Unity.Resolution;
 

@@ -81,6 +81,13 @@ namespace Unity.Processors
                                                                         ISelect<TMemberInfo>
                                                     where TMemberInfo : MemberInfo
     {
+        #region Constants
+
+        protected const string NoMatchFound = "No MemberInfo matching injected data has been found";
+
+        #endregion
+
+
         #region Fields
 
         private readonly IPolicySet _policySet;
@@ -234,8 +241,8 @@ namespace Unity.Processors
                                         _policySet.Get(typeof(TPolicyInterface)));
         }
 
-        protected virtual TMemberInfo MemberInfo(InjectionMember<TMemberInfo, TData> member, Type type) => 
-            throw new ArgumentException("No member info matching data has been found");
+        protected virtual TMemberInfo? GetInjectedInfo(InjectionMember<TMemberInfo, TData> member, Type type) 
+            => member.MemberInfo(type);
 
         #endregion
 
