@@ -15,7 +15,7 @@ namespace Unity.Processors
     {
         #region Constructors
 
-        public MethodDiagnostic(IPolicySet policySet, UnityContainer container) 
+        public MethodDiagnostic(IPolicySet policySet, UnityContainer container)
             : base(policySet, container)
         {
         }
@@ -40,7 +40,7 @@ namespace Unity.Processors
             }
 
             // Select Attributed members
-            foreach (var member in type.GetMethods(BindingFlags.Public   | BindingFlags.NonPublic | 
+            foreach (var member in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic |
                                                    BindingFlags.Instance | BindingFlags.Static))
             {
                 for (var i = 0; i < AttributeFactories.Length; i++)
@@ -98,7 +98,7 @@ namespace Unity.Processors
                         Expression.Constant(info, typeof(object))),
                 Expression.Rethrow(typeof(void)));
 
-            return 
+            return
                 Expression.TryCatch(
                     Expression.Call(
                         Expression.Convert(BuilderContextExpression.Existing, info.DeclaringType),
@@ -136,41 +136,40 @@ namespace Unity.Processors
 
         #region Validation
 
-        //public override void Validate(Type type)
+        //protected override MethodInfo? GetInjectedInfo(InjectionMember<MethodInfo, object[]> member, Type type)
         //{
-        //    if (null == type) throw new ArgumentNullException(nameof(type));
-
         //    // Select valid constructor
         //    MethodInfo? selection = null;
-        //    foreach (var info in DeclaredMembers(type))
+        //    foreach (var method in DeclaredMembers(type))
         //    {
-        //        if (!Data.MatchMemberInfo(info)) continue;
+        //        if (member is IComparable<MethodInfo> comparer && 0 > comparer.CompareTo(method)) continue;
 
         //        if (null != selection)
         //        {
-        //            var message = $" InjectionMethod({Data.Signature()})  is ambiguous \n" +
+        //            var message = $" InjectionMethod({member})  is ambiguous \n" +
         //                $" It could be matched with more than one method on type '{type.Name}': \n\n" +
-        //                $"    {selection} \n    {info}";
+        //                $"    {selection} \n    {method}";
 
         //            throw new InvalidOperationException(message);
         //        }
 
-        //        selection = info;
+        //        selection = method;
         //    }
 
         //    // stop if found
-        //    if (null != selection) return;
+        //    if (null != selection) return selection;
 
         //    // Select invalid constructor
-        //    foreach (var info in type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public |
-        //                                              BindingFlags.Instance | BindingFlags.Static)
-        //                             .Where(ctor => ctor.IsFamily || ctor.IsPrivate || ctor.IsStatic))
+        //    foreach (var info in type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public |
+        //                                         BindingFlags.Instance  | BindingFlags.Static)
+        //                             .Where(method => method.Name == member.Name &&  
+        //                                             (method.IsFamily || method.IsPrivate || method.IsStatic)))
         //    {
-        //        if (!Data.MatchMemberInfo(info)) continue;
+        //        if (member is IComparable<MethodInfo> comparer && 0 > comparer.CompareTo(info)) continue;
 
         //        if (info.IsStatic)
         //        {
-        //            var message = $" InjectionMethod({Data.Signature()})  does not match any valid methods \n" +
+        //            var message = $" InjectionMethod({member})  does not match any valid methods \n" +
         //                $" It matches static method {info} but static methods are not supported.";
 
         //            throw new InvalidOperationException(message);
@@ -178,7 +177,7 @@ namespace Unity.Processors
 
         //        if (info.IsPrivate)
         //        {
-        //            var message = $" InjectionMethod({Data.Signature()})  does not match any valid constructors \n" +
+        //            var message = $" InjectionMethod({member})  does not match any valid constructors \n" +
         //                $" It matches private method {info} but private methods are not supported.";
 
         //            throw new InvalidOperationException(message);
@@ -186,7 +185,7 @@ namespace Unity.Processors
 
         //        if (info.IsFamily)
         //        {
-        //            var message = $" InjectionMethod({Data.Signature()})  does not match any valid constructors \n" +
+        //            var message = $" InjectionMethod({member})  does not match any valid constructors \n" +
         //                $" It matches protected method {info} but protected methods are not supported.";
 
         //            throw new InvalidOperationException(message);
@@ -194,7 +193,7 @@ namespace Unity.Processors
         //    }
 
         //    throw new InvalidOperationException(
-        //        $"InjectionMethod({Data.Signature()}) could not be matched with any method on type {type.Name}.");
+        //        $"InjectionMethod({member}) could not be matched with any method on type {type.Name}.");
         //}
 
         #endregion

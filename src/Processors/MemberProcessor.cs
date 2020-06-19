@@ -92,6 +92,7 @@ namespace Unity.Processors
 
         private readonly IPolicySet _policySet;
         protected AttributeFactoryNode[] AttributeFactories;
+        protected Func<InjectionMember<TMemberInfo, TData>, Type, TMemberInfo?> MemberInfo;
 
         #endregion
 
@@ -100,6 +101,8 @@ namespace Unity.Processors
 
         protected MemberProcessor(IPolicySet policySet)
         {
+            MemberInfo = GetInjectedInfo;
+
             // Add Unity attribute factories
             AttributeFactories = new[]
             {
@@ -112,6 +115,8 @@ namespace Unity.Processors
 
         protected MemberProcessor(IPolicySet policySet, Type attribute)
         {
+            MemberInfo = GetInjectedInfo;
+
             // Add Unity attribute factories
             AttributeFactories = new[]
             {

@@ -108,9 +108,7 @@ namespace Unity.Processors
 
         protected override FieldInfo? GetInjectedInfo(InjectionMember<FieldInfo, object> member, Type type)
         {
-            if (null != member.Info && member.Info.DeclaringType == type)
-                return member.Info;
-
+            // TODO: Implement
             return type.GetField(member.Name);
         }
 

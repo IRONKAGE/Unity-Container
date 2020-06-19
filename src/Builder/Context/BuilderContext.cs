@@ -56,7 +56,7 @@ namespace Unity.Builder
                     var resolverOverride = Overrides[index];
                     // If matches with current parameter
                     if (resolverOverride is IResolve resolverPolicy &&
-                        resolverOverride is IMatch<NamedType> comparer && comparer.Match(namedType))
+                        resolverOverride is IEquatable<NamedType> equatable && equatable.Equals(namedType))
                     {
                         var context = this;
 
@@ -192,7 +192,7 @@ namespace Unity.Builder
                     var resolverOverride = Overrides[index];
 
                     // If matches with current parameter
-                    if (resolverOverride is IMatch<ParameterInfo> comparer && comparer.Match(parameter))
+                    if (resolverOverride is IEquatable<ParameterInfo> equatable && equatable.Equals(parameter))
                     {
                         // Check if itself is a value 
                         if (resolverOverride is IResolve resolverPolicy)
@@ -237,7 +237,7 @@ namespace Unity.Builder
                     var resolverOverride = Overrides[index];
 
                     // Check if this parameter is overridden
-                    if (resolverOverride is IMatch<PropertyInfo> comparer && comparer.Match(property))
+                    if (resolverOverride is IEquatable<PropertyInfo> equatable && equatable.Equals(property))
                     {
                         // Check if itself is a value 
                         if (resolverOverride is IResolve resolverPolicy)
@@ -292,7 +292,7 @@ namespace Unity.Builder
                     var resolverOverride = Overrides[index];
 
                     // Check if this parameter is overridden
-                    if (resolverOverride is IMatch<FieldInfo> comparer && comparer.Match(field))
+                    if (resolverOverride is IEquatable<FieldInfo> equatable && equatable.Equals(field))
                     {
                         // Check if itself is a value 
                         if (resolverOverride is IResolve resolverPolicy)

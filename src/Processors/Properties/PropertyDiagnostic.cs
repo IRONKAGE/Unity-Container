@@ -122,8 +122,7 @@ namespace Unity.Processors
 
         protected override PropertyInfo? GetInjectedInfo(InjectionMember<PropertyInfo, object> member, Type type)
         {
-            if (null != member.Info && member.Info.DeclaringType == type)
-                return member.Info;
+            // TODO: Implement
 
             return type.GetProperty(member.Name);
         }
