@@ -482,7 +482,7 @@ namespace Unity
             return context.Existing;
 
 #if !NET40
-            object? GetPerResolveValue(IntPtr parent, Type registrationType, string name)
+            object? GetPerResolveValue(IntPtr parent, Type registrationType, string? name)
             {
                 if (IntPtr.Zero == parent) return null;
 

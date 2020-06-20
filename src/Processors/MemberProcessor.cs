@@ -253,13 +253,13 @@ namespace Unity.Processors
 
         #region Attribute Resolver Factories
 
-        protected virtual ResolveDelegate<BuilderContext> DependencyResolverFactory(Attribute attribute, object info, object value = null)
+        protected virtual ResolveDelegate<BuilderContext> DependencyResolverFactory(Attribute attribute, object info, object? value = null)
         {
             var type = MemberType((TMemberInfo)info);
             return (ref BuilderContext context) => context.Resolve(type, ((DependencyResolutionAttribute)attribute).Name);
         }
 
-        protected virtual ResolveDelegate<BuilderContext> OptionalDependencyResolverFactory(Attribute attribute, object info, object value = null)
+        protected virtual ResolveDelegate<BuilderContext> OptionalDependencyResolverFactory(Attribute attribute, object info, object? value = null)
         {
             var type = MemberType((TMemberInfo)info);
             return (ref BuilderContext context) =>
@@ -284,10 +284,10 @@ namespace Unity.Processors
         public struct AttributeFactoryNode
         {
             public readonly Type Type;
-            public Func<Attribute, object, object, ResolveDelegate<BuilderContext>> Factory;
+            public Func<Attribute, object?, object?, ResolveDelegate<BuilderContext>> Factory;
             public Func<Attribute, string> Name;
 
-            public AttributeFactoryNode(Type type, Func<Attribute, string> getName, Func<Attribute, object, object, ResolveDelegate<BuilderContext>> factory)
+            public AttributeFactoryNode(Type type, Func<Attribute, string> getName, Func<Attribute, object?, object?, ResolveDelegate<BuilderContext>> factory)
             {
                 Type = type;
                 Name = getName;

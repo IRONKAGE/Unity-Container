@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security;
 using Unity.Exceptions;
-using Unity.Injection;
 using Unity.Lifetime;
 using Unity.Policy;
 using Unity.Registration;
@@ -37,9 +36,9 @@ namespace Unity.Builder
 
         public Type Type { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public object Resolve(Type type, string name)
+        public object Resolve(Type type, string? name)
         {
             // Process overrides if any
             if (null != Overrides)
@@ -148,7 +147,7 @@ namespace Unity.Builder
 
         #region Public Methods
 
-        public object Resolve(Type type, string name, InternalRegistration registration)
+        public object Resolve(Type type, string? name, InternalRegistration registration)
         {
             unsafe
             {
