@@ -73,7 +73,7 @@ namespace Unity
             return _parent?.IsTypeExplicitlyRegistered(type) ?? false;
         }
 
-        internal bool RegistrationExists(Type type, string name)
+        internal bool RegistrationExists(Type? type, string name)
         {
             IPolicySet? defaultRegistration = null;
             IPolicySet? noNameRegistration = null;
@@ -621,7 +621,7 @@ namespace Unity
             return policy ?? _parent?.GetPolicy(type, name, policyInterface);
         }
 
-        private void Set(Type type, string name, Type policyInterface, object policy)
+        private void Set(Type? type, string? name, Type policyInterface, object policy)
         {
             var collisions = 0;
             var hashCode = (type?.GetHashCode() ?? 0) & 0x7FFFFFFF;
