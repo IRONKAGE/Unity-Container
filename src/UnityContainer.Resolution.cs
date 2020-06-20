@@ -353,7 +353,9 @@ namespace Unity
                 {
                     context.RequiresRecovery?.Recover();
 
-                    if (!(ex.InnerException is InvalidRegistrationException) && 
+                    // TODO: Require optimization
+                    if (!(ex.InnerException is InvalidRegistrationException) &&
+                        !(ex.InnerException is CircularDependencyException) &&
                         !(ex is InvalidRegistrationException) &&
                         !(ex is ObjectDisposedException) && 
                         !(ex is MemberAccessException) && 
@@ -396,10 +398,11 @@ namespace Unity
                         ? (object)new Tuple<Type, string>(context.Type, context.Name)
                         : new Tuple<Type, Type, string>(context.RegistrationType, context.Type, context.Name));
 
+                // TODO: Require optimization
                 if (!(ex.InnerException is InvalidRegistrationException) &&
                     !(ex.InnerException is CircularDependencyException) &&
                     !(ex is CircularDependencyException) &&
-                    !(ex is TargetInvocationException) &&  // TODO: Unpack internal exception
+                    !(ex is TargetInvocationException) &&
                     !(ex is MakeGenericTypeFailedException))
                     throw;
 
