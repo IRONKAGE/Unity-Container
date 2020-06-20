@@ -254,7 +254,7 @@ namespace Unity
             var counter = 3;
             var type = context.Type;
             var registration = context.Registration;
-            ResolveDelegate<BuilderContext> seed = null;
+            ResolveDelegate<BuilderContext>? seed = null;
             var chain = ((UnityContainer) context.Container)._processorsChain;
 
             // Generate build chain
@@ -316,14 +316,16 @@ namespace Unity
 
         internal ResolveDelegate<BuilderContext> ResolvingFactory(ref BuilderContext context)
         {
-            ResolveDelegate<BuilderContext> seed = null;
+            ResolveDelegate<BuilderContext>? seed = null;
             var type = context.Type;
             var registration = context.Registration;
 
             foreach (var processor in _processorsChain)
                 seed = processor.GetResolver(type, registration, seed);
 
-            return seed;
+            System.Diagnostics.Debug.Assert(null != seed);
+
+            return seed!;
         }
 
         #endregion
@@ -369,7 +371,7 @@ namespace Unity
                 return context.Existing;
             };
 
-        private object ExecuteValidatingPlan(ref BuilderContext context)
+        private object? ExecuteValidatingPlan(ref BuilderContext context)
         {
             var i = -1;
             BuilderStrategy[] chain = ((InternalRegistration)context.Registration).BuildChain;
@@ -445,7 +447,7 @@ namespace Unity
                 return context.Existing;
             };
 
-        internal static object ContextValidatingExecutePlan(BuilderStrategy[] chain, ref BuilderContext context)
+        internal static object? ContextValidatingExecutePlan(BuilderStrategy[] chain, ref BuilderContext context)
         {
             var i = -1;
 #if !NET40
@@ -480,7 +482,7 @@ namespace Unity
             return context.Existing;
 
 #if !NET40
-            object GetPerResolveValue(IntPtr parent, Type registrationType, string name)
+            object? GetPerResolveValue(IntPtr parent, Type registrationType, string name)
             {
                 if (IntPtr.Zero == parent) return null;
 
@@ -504,7 +506,7 @@ namespace Unity
         internal BuilderContext.ResolvePlanDelegate ContextResolvePlan { get; set; } =
             (ref BuilderContext context, ResolveDelegate<BuilderContext> resolver) => resolver(ref context);
 
-        internal static object ContextValidatingResolvePlan(ref BuilderContext thisContext, ResolveDelegate<BuilderContext> resolver)
+        internal static object? ContextValidatingResolvePlan(ref BuilderContext thisContext, ResolveDelegate<BuilderContext> resolver)
         {
             if (null == resolver) throw new ArgumentNullException(nameof(resolver));
 

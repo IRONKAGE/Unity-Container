@@ -75,8 +75,8 @@ namespace Unity
 
         internal bool RegistrationExists(Type type, string name)
         {
-            IPolicySet defaultRegistration = null;
-            IPolicySet noNameRegistration = null;
+            IPolicySet? defaultRegistration = null;
+            IPolicySet? noNameRegistration = null;
 
             var hashCode = (type?.GetHashCode() ?? 0) & 0x7FFFFFFF;
             for (var container = this; null != container; container = container._parent)
@@ -601,9 +601,9 @@ namespace Unity
 
         #region Local policy manipulation
 
-        private object Get(Type type, string name, Type policyInterface)
+        private object? Get(Type type, string name, Type policyInterface)
         {
-            object policy = null;
+            object? policy = null;
             var hashCode = (type?.GetHashCode() ?? 0) & 0x7FFFFFFF;
             var targetBucket = hashCode % _registrations.Buckets.Length;
             for (var i = _registrations.Buckets[targetBucket]; i >= 0; i = _registrations.Entries[i].Next)

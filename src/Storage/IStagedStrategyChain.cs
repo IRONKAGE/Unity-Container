@@ -6,7 +6,7 @@ namespace Unity.Storage
     /// This interface defines a standard method to create multi staged strategy chain.
     /// </summary>
     /// <typeparam name="TStrategyType">The <see cref="System.Type"/> of strategy</typeparam>
-    /// <typeparam name="TStageEnum">The stage enum</typeparam>
+    /// <typeparam name="TStageEnum">The stage enumeration</typeparam>
     public interface IStagedStrategyChain<in TStrategyType, in TStageEnum>
     {
 
@@ -30,7 +30,7 @@ namespace Unity.Storage
         /// Add a new strategy for the <paramref name="stage"/>.
         /// </summary>
         /// <typeparam name="TStrategy">The <see cref="System.Type"/> of strategy</typeparam>
-        /// <typeparam name="TStageEnum">The stage enum</typeparam>
+        /// <typeparam name="TStageEnum">The stage enumeration</typeparam>
         /// <param name="chain">The chain this strategy is added to.</param>
         /// <param name="stage">The stage to add the strategy to.</param>
         public static void AddNew<TStrategy, TStageEnum>(this IStagedStrategyChain<TStrategy, TStageEnum> chain, TStageEnum stage)

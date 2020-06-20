@@ -72,7 +72,7 @@ namespace Unity.Processors
         /// <param name="registration"></param>
         /// <param name="seed"></param>
         /// <returns></returns>
-        public abstract ResolveDelegate<BuilderContext> GetResolver(Type type, IPolicySet registration, ResolveDelegate<BuilderContext> seed);
+        public abstract ResolveDelegate<BuilderContext> GetResolver(Type type, IPolicySet registration, ResolveDelegate<BuilderContext>? seed);
 
         #endregion
     }
@@ -163,7 +163,7 @@ namespace Unity.Processors
         }
 
         /// <inheritdoc />
-        public override ResolveDelegate<BuilderContext> GetResolver(Type type, IPolicySet registration, ResolveDelegate<BuilderContext> seed)
+        public override ResolveDelegate<BuilderContext> GetResolver(Type type, IPolicySet registration, ResolveDelegate<BuilderContext>? seed)
         {
             var selector = GetPolicy<ISelect<TMemberInfo>>(registration);
             var members = selector.Select(type, registration);
@@ -171,7 +171,7 @@ namespace Unity.Processors
 
             return (ref BuilderContext c) =>
             {
-                if (null == (c.Existing = seed(ref c))) return null;
+                if (null == (c.Existing = seed?.Invoke(ref c))) return null;
                 foreach (var resolver in resolvers) resolver(ref c);
                 return c.Existing;
             };

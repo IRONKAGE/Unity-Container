@@ -52,7 +52,7 @@ namespace Unity.Injection
 
         #region InjectionMember
 
-        public void AddPolicies<TPolicySet>(Type type, string name, ref TPolicySet policies) where TPolicySet : IPolicySet
+        public void AddPolicies<TPolicySet>(Type type, string? name, ref TPolicySet policies) where TPolicySet : IPolicySet
         {
             // Check if Per Resolve lifetime is required
             var lifetime = policies.Get(typeof(LifetimeManager));
