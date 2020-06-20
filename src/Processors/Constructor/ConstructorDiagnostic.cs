@@ -22,6 +22,7 @@ namespace Unity.Processors
         const string CannotConstructDelegate = "The current type, {0}, is delegate and cannot be constructed. Unity only supports resolving Func&lt;T&gt; and Func&lt;IEnumerable&lt;T&gt;&gt; by default.";
         const string CannotConstructInterface = "The current type, {0}, is an interface and cannot be constructed. Are you missing a type mapping?";
         const string TypeIsNotConstructable = "The type {0} cannot be constructed. You must configure the container to supply this value.";
+        const string TypeIsGenericDefinition = "The type {0} is open generic definition. Please configure missing type parameters.";
 
         private static readonly Expression[] CannotConstructInterfaceExpr = new [] {
             Expression.IfThen(Expression.Equal(Expression.Constant(null), BuilderContextExpression.Existing),
@@ -60,6 +61,17 @@ namespace Unity.Processors
                         Expression.Call(
                             StringFormat,
                             Expression.Constant(TypeIsNotConstructable),
+                            BuilderContextExpression.Type),
+                        InvalidRegistrationExpression)))};
+
+
+        private static readonly Expression[] TypeIsGenericDefinitionExpr = new[] {
+            Expression.IfThen(Expression.Equal(Expression.Constant(null), BuilderContextExpression.Existing),
+                 Expression.Throw(
+                    Expression.New(InvalidOperationExceptionCtor,
+                        Expression.Call(
+                            StringFormat,
+                            Expression.Constant(TypeIsGenericDefinition),
                             BuilderContextExpression.Type),
                         InvalidRegistrationExpression)))};
 
@@ -193,67 +205,71 @@ namespace Unity.Processors
         #endregion
 
 
-        #region Injection Validation
+        #region Injection
 
-        //protected override ConstructorInfo GetInjectedInfo(InjectionMember<ConstructorInfo, object[]> member, Type type)
-        //{
-        //    // Select valid constructor
-        //    ConstructorInfo? selection = null;
-        //    foreach (var ctor in DeclaredMembers(type))
-        //    {
-        //        if (member is IComparable<ConstructorInfo> constructor && 0 > constructor.CompareTo(ctor)) continue;
+        protected override ConstructorInfo? GetMemberInfo(InjectionMember<ConstructorInfo, object[]> member, Type type)
+        {
+            int bestSoFar = -1;
+            ConstructorInfo? candidate = null;
+            var methodBase = (InjectionMethodBase<ConstructorInfo>)member;
 
-        //        if (null != selection)
-        //        {
-        //            var message = $" InjectionConstructor({member})  is ambiguous \n" +
-        //                $" It could be matched with more than one constructor on type '{type.Name}': \n\n" +
-        //                $"    {selection} \n    {ctor}";
+            foreach (var constructor in methodBase.DeclaredMembers(type))
+            {
+                var compatibility = methodBase.CompareTo(constructor);
 
-        //            throw new InvalidOperationException(message, new InvalidRegistrationException());
-        //        }
+                if (0 <= bestSoFar && bestSoFar == compatibility)
+                {
+                    var message = $" InjectionConstructor({member})  is ambiguous \n" +
+                        $" It could be matched with more than one method on type '{type.Name}': \n\n" +
+                        $"    {candidate} \n    {constructor}";
 
-        //        selection = ctor;
-        //    }7
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
 
-        //    // stop if found
-        //    if (null != selection) return selection;
+                if (0 != bestSoFar && bestSoFar < compatibility)
+                {
+                    candidate = constructor;
+                    bestSoFar = compatibility;
+                }
+            }
 
-        //    // Select invalid constructor
-        //    foreach (var info in type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public |
-        //                                              BindingFlags.Instance  | BindingFlags.Static)
-        //                             .Where(ctor => ctor.IsFamily || ctor.IsPrivate || ctor.IsStatic))
-        //    {
-        //        if (!member.Data.MatchMemberInfo(info)) continue;
+            // Stop if found exact match
+            if (null != candidate) return candidate;
 
-        //        if (info.IsStatic)
-        //        {
-        //            var message = $" InjectionConstructor({member})  does not match any valid constructors \n" +
-        //                $" It matches static constructor {info} but static constructors are not supported.";
+            // Select invalid constructor
+            foreach (var info in type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public |
+                                                       BindingFlags.Instance | BindingFlags.Static)
+                                     .Where(method => method.IsFamily || method.IsPrivate || method.IsStatic))
+            {
+                if (member is IComparable<ConstructorInfo> comparer && 0 > comparer.CompareTo(info)) continue;
 
-        //            throw new InvalidOperationException(message, new InvalidRegistrationException());
-        //        }
+                if (info.IsStatic)
+                {
+                    var message = $" InjectionConstructor({member})  does not match any valid constructors \n" +
+                        $" It matches static constructor {info} but static constructors are not supported.";
 
-        //        if (info.IsPrivate)
-        //        {
-        //            var message = $" InjectionConstructor({member})  does not match any valid constructors \n" +
-        //                $" It matches private constructor {info} but private constructors are not supported.";
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
 
-        //            throw new InvalidOperationException(message, new InvalidRegistrationException());
-        //        }
+                if (info.IsPrivate)
+                {
+                    var message = $" InjectionConstructor({member})  does not match any valid constructors \n" +
+                        $" It matches private constructor {info} but private constructors are not supported.";
 
-        //        if (info.IsFamily)
-        //        {
-        //            var message = $" InjectionConstructor({member})  does not match any valid constructors \n" +
-        //                $" It matches protected constructor {info} but protected constructors are not supported.";
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
 
-        //            throw new InvalidOperationException(message, new InvalidRegistrationException());
-        //        }
-        //    }
+                if (info.IsFamily)
+                {
+                    var message = $" InjectionConstructor({member})  does not match any valid constructors \n" +
+                        $" It matches protected constructor {info} but protected constructors are not supported.";
 
-        //    throw new InvalidOperationException(
-        //        $"InjectionConstructor({member}) could not be matched with any constructors on type {type.Name}.", 
-        //        new InvalidRegistrationException());
-        //}
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
+            }
+
+            return null;
+        }
 
         #endregion
 
@@ -274,6 +290,9 @@ namespace Unity.Processors
 
             if (typeInfo.IsSubclassOf(typeof(Delegate)))
                 return CannotConstructDelegateExpr;
+
+            if (type.IsGenericTypeDefinition())
+                return TypeIsGenericDefinitionExpr;
 
             if (type == typeof(string))
                 return TypeIsNotConstructableExpr;
@@ -374,6 +393,20 @@ namespace Unity.Processors
                 };
             }
 
+            if (type.IsGenericTypeDefinition())
+            {
+                {
+                    return (ref BuilderContext c) =>
+                    {
+                        if (null == c.Existing)
+                            throw new InvalidOperationException(string.Format(TypeIsGenericDefinition, c.Type),
+                                new InvalidRegistrationException());
+
+                        return c.Existing;
+                    };
+                }
+            }
+
             if (type == typeof(string))
             {
                 return (ref BuilderContext c) =>
@@ -385,7 +418,6 @@ namespace Unity.Processors
                     return c.Existing;
                 };
             }
-
 
             return base.GetResolver(type, registration, seed);
         }

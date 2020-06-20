@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Unity.Builder;
+using Unity.Exceptions;
 using Unity.Injection;
 using Unity.Policy;
 using Unity.Registration;
@@ -27,14 +28,14 @@ namespace Unity.Processors
 
         public override IEnumerable<object> Select(Type type, IPolicySet registration)
         {
-            HashSet<object> memberSet = new HashSet<object>();
+            HashSet<string> memberSet = new HashSet<string>();
 
             // Select Injected Members
             if (null != ((InternalRegistration)registration).InjectionMembers)
             {
                 foreach (var injectionMember in ((InternalRegistration)registration).InjectionMembers)
                 {
-                    if (injectionMember is InjectionMember<MethodInfo, object[]> && memberSet.Add(injectionMember))
+                    if (injectionMember is InjectionMember<MethodInfo, object[]> member && memberSet.Add(member.Name))
                         yield return injectionMember;
                 }
             }
@@ -46,40 +47,40 @@ namespace Unity.Processors
                 for (var i = 0; i < AttributeFactories.Length; i++)
                 {
                     if (!member.IsDefined(AttributeFactories[i].Type) ||
-                        !memberSet.Add(member)) continue;
+                        !memberSet.Add(member.Name)) continue;
 
                     // Validate
                     if (member.IsStatic)
                     {
                         throw new ArgumentException(
-                            $"Static method {member.Name} on type '{member.DeclaringType.Name}' is marked for injection. Static methods cannot be injected");
+                            $"Static method {member.Name} on type '{member.DeclaringType.Name}' is marked for injection. Static methods cannot be injected", new InvalidRegistrationException());
                     }
 
                     if (member.IsPrivate)
                         throw new InvalidOperationException(
-                            $"Private method '{member.Name}' on type '{member.DeclaringType.Name}' is marked for injection. Private methods cannot be injected");
+                            $"Private method '{member.Name}' on type '{member.DeclaringType.Name}' is marked for injection. Private methods cannot be injected", new InvalidRegistrationException());
 
                     if (member.IsFamily)
                         throw new InvalidOperationException(
-                            $"Protected method '{member.Name}' on type '{member.DeclaringType.Name}' is marked for injection. Protected methods cannot be injected");
+                            $"Protected method '{member.Name}' on type '{member.DeclaringType.Name}' is marked for injection. Protected methods cannot be injected", new InvalidRegistrationException());
 
                     if (member.IsGenericMethodDefinition)
                     {
                         throw new ArgumentException(
-                            $"Open generic method {member.Name} on type '{member.DeclaringType.Name}' is marked for injection. Open generic methods cannot be injected.");
+                            $"Open generic method {member.Name} on type '{member.DeclaringType.Name}' is marked for injection. Open generic methods cannot be injected.", new InvalidRegistrationException());
                     }
 
                     var parameters = member.GetParameters();
                     if (parameters.Any(param => param.IsOut))
                     {
                         throw new ArgumentException(
-                            $"Method {member.Name} on type '{member.DeclaringType.Name}' is marked for injection. Methods with 'out' parameters cannot be injected.");
+                            $"Method {member.Name} on type '{member.DeclaringType.Name}' is marked for injection. Methods with 'out' parameters cannot be injected.", new InvalidRegistrationException());
                     }
 
                     if (parameters.Any(param => param.ParameterType.IsByRef))
                     {
                         throw new ArgumentException(
-                            $"Method {member.Name} on type '{member.DeclaringType.Name}' is marked for injection. Methods with 'ref' parameters cannot be injected.");
+                            $"Method {member.Name} on type '{member.DeclaringType.Name}' is marked for injection. Methods with 'ref' parameters cannot be injected.", new InvalidRegistrationException());
                     }
 
                     yield return member;
@@ -92,18 +93,19 @@ namespace Unity.Processors
         {
             var ex = Expression.Variable(typeof(Exception));
             var exData = Expression.MakeMemberAccess(ex, DataProperty);
-            var block = Expression.Block(typeof(void),
+            var tryBlock = Expression.Call(
+                        Expression.Convert(BuilderContextExpression.Existing, info.DeclaringType),
+                        info, CreateDiagnosticParameterExpressions(info.GetParameters(), resolvers));
+
+            // Add location to dictionary and re-throw
+            var catchBlock = Expression.Block(tryBlock.Type,
                 Expression.Call(exData, AddMethod,
                         Expression.Convert(NewGuid, typeof(object)),
                         Expression.Constant(info, typeof(object))),
-                Expression.Rethrow(typeof(void)));
+                Expression.Rethrow(tryBlock.Type));
 
             return
-                Expression.TryCatch(
-                    Expression.Call(
-                        Expression.Convert(BuilderContextExpression.Existing, info.DeclaringType),
-                        info, CreateDiagnosticParameterExpressions(info.GetParameters(), resolvers)),
-                Expression.Catch(ex, block));
+                Expression.TryCatch(tryBlock, Expression.Catch(ex, catchBlock));
         }
 
         protected override ResolveDelegate<BuilderContext> GetResolverDelegate(MethodInfo info, object resolvers)
@@ -134,67 +136,91 @@ namespace Unity.Processors
         #endregion
 
 
-        #region Validation
+        #region Injection
 
-        //protected override MethodInfo? GetInjectedInfo(InjectionMember<MethodInfo, object[]> member, Type type)
-        //{
-        //    // Select valid constructor
-        //    MethodInfo? selection = null;
-        //    foreach (var method in DeclaredMembers(type))
-        //    {
-        //        if (member is IComparable<MethodInfo> comparer && 0 > comparer.CompareTo(method)) continue;
+        protected override MethodInfo? GetMemberInfo(InjectionMember<MethodInfo, object[]> member, Type type)
+        {
+            int bestSoFar = -1;
+            MethodInfo? candidate = null;
+            var methodBase = (InjectionMethodBase<MethodInfo>)member;
+            var candidates = methodBase.DeclaredMembers(type)
+                                       .ToArray();
 
-        //        if (null != selection)
-        //        {
-        //            var message = $" InjectionMethod({member})  is ambiguous \n" +
-        //                $" It could be matched with more than one method on type '{type.Name}': \n\n" +
-        //                $"    {selection} \n    {method}";
+            foreach (var method in candidates)
+            {
+                var compatibility = methodBase.CompareTo(method);
 
-        //            throw new InvalidOperationException(message);
-        //        }
+                if (0 <= bestSoFar && bestSoFar == compatibility)
+                {
+                    var message = $" InjectionMethod({member})  is ambiguous \n" +
+                        $" It could be matched with more than one method on type '{type.Name}': \n\n" +
+                        $"    {candidate} \n    {method}";
 
-        //        selection = method;
-        //    }
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
 
-        //    // stop if found
-        //    if (null != selection) return selection;
+                if (0 != bestSoFar && bestSoFar < compatibility)
+                {
+                    candidate = method;
+                    bestSoFar = compatibility;
+                }
+            }
 
-        //    // Select invalid constructor
-        //    foreach (var info in type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public |
-        //                                         BindingFlags.Instance  | BindingFlags.Static)
-        //                             .Where(method => method.Name == member.Name &&  
-        //                                             (method.IsFamily || method.IsPrivate || method.IsStatic)))
-        //    {
-        //        if (member is IComparable<MethodInfo> comparer && 0 > comparer.CompareTo(info)) continue;
+            // Stop if found exact match
+            if (null != candidate) return candidate;
 
-        //        if (info.IsStatic)
-        //        {
-        //            var message = $" InjectionMethod({member})  does not match any valid methods \n" +
-        //                $" It matches static method {info} but static methods are not supported.";
+            // No selection data, check if can match unique name
+            if (null == member.Data || 0 == member.Data.Length)
+            {
+                // Matches unique name
+                if (1 == candidates.Length) return candidates[0];
 
-        //            throw new InvalidOperationException(message);
-        //        }
+                // More than one match
+                if (1 < candidates.Length)
+                {
+                    var message = $" InjectionMethod({member})  is ambiguous \n" +
+                        $" It could be matched with more than one method on type '{type.Name}': \n\n" +
+                        $"    {candidates[0]} \n    {candidates[1]}";
 
-        //        if (info.IsPrivate)
-        //        {
-        //            var message = $" InjectionMethod({member})  does not match any valid constructors \n" +
-        //                $" It matches private method {info} but private methods are not supported.";
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
+            }
 
-        //            throw new InvalidOperationException(message);
-        //        }
+            // Select invalid constructor
+            foreach (var info in type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public |
+                                                 BindingFlags.Instance  | BindingFlags.Static)
+                                     .Where(method => method.Name == member.Name &&
+                                                     (method.IsFamily || method.IsPrivate || method.IsStatic)))
+            {
+                if (member is IComparable<MethodInfo> comparer && 0 > comparer.CompareTo(info)) continue;
 
-        //        if (info.IsFamily)
-        //        {
-        //            var message = $" InjectionMethod({member})  does not match any valid constructors \n" +
-        //                $" It matches protected method {info} but protected methods are not supported.";
+                if (info.IsStatic)
+                {
+                    var message = $" InjectionMethod({member})  does not match any valid methods \n" +
+                        $" It matches static method {info} but static methods are not supported.";
 
-        //            throw new InvalidOperationException(message);
-        //        }
-        //    }
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
 
-        //    throw new InvalidOperationException(
-        //        $"InjectionMethod({member}) could not be matched with any method on type {type.Name}.");
-        //}
+                if (info.IsPrivate)
+                {
+                    var message = $" InjectionMethod({member})  does not match any valid constructors \n" +
+                        $" It matches private method {info} but private methods are not supported.";
+
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
+
+                if (info.IsFamily)
+                {
+                    var message = $" InjectionMethod({member})  does not match any valid constructors \n" +
+                        $" It matches protected method {info} but protected methods are not supported.";
+
+                    throw new InvalidOperationException(message, new InvalidRegistrationException());
+                }
+            }
+
+            return null;
+        }
 
         #endregion
     }

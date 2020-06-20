@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using Unity.Builder;
+using Unity.Exceptions;
 using Unity.Injection;
 using Unity.Policy;
 using Unity.Registration;
@@ -48,19 +49,19 @@ namespace Unity.Processors
 
                     if (member.IsStatic)
                         throw new InvalidOperationException(
-                            $"Static field '{member.Name}' on type '{type?.Name}' is marked for injection. Static fields cannot be injected");
+                            $"Static field '{member.Name}' on type '{type?.Name}' is marked for injection. Static fields cannot be injected", new InvalidRegistrationException());
 
                     if (member.IsInitOnly)
                         throw new InvalidOperationException(
-                            $"Readonly field '{member.Name}' on type '{type?.Name}' is marked for injection. Readonly fields cannot be injected");
+                            $"Readonly field '{member.Name}' on type '{type?.Name}' is marked for injection. Readonly fields cannot be injected", new InvalidRegistrationException());
 
                     if (member.IsPrivate)
                         throw new InvalidOperationException(
-                            $"Private field '{member.Name}' on type '{type?.Name}' is marked for injection. Private fields cannot be injected");
+                            $"Private field '{member.Name}' on type '{type?.Name}' is marked for injection. Private fields cannot be injected", new InvalidRegistrationException());
 
                     if (member.IsFamily)
                         throw new InvalidOperationException(
-                            $"Protected field '{member.Name}' on type '{type?.Name}' is marked for injection. Protected fields cannot be injected");
+                            $"Protected field '{member.Name}' on type '{type?.Name}' is marked for injection. Protected fields cannot be injected", new InvalidRegistrationException());
 
                     yield return member;
                     break;
@@ -99,17 +100,6 @@ namespace Unity.Processors
                     throw;
                 }
             };
-        }
-
-        #endregion
-
-
-        #region Injection
-
-        protected override FieldInfo? GetInjectedInfo(InjectionMember<FieldInfo, object> member, Type type)
-        {
-            // TODO: Implement
-            return type.GetField(member.Name);
         }
 
         #endregion

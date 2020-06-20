@@ -34,7 +34,7 @@ namespace Unity.Processors
 
                     // Injection Member
                     case InjectionMember<TMemberInfo, TData> injectionMember:
-                        TMemberInfo selection = GetInjectedInfo(injectionMember, type) ??
+                        TMemberInfo selection = MemberInfo(injectionMember, type) ??
                             throw new InvalidOperationException(NoMatchFound, new InvalidRegistrationException());
                         yield return GetResolverDelegate(selection, injectionMember.Data);
                         break;

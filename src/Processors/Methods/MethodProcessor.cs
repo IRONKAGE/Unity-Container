@@ -25,7 +25,7 @@ namespace Unity.Processors
 
         #region Selection
 
-        protected override IEnumerable<MethodInfo> DeclaredMembers(Type type) => 
+        protected override IEnumerable<MethodInfo> DeclaredMembers(Type type) =>
             type.SupportedMethods();
 
         #endregion
@@ -74,21 +74,11 @@ namespace Unity.Processors
 
         #region Injection
 
-        protected override MethodInfo? GetInjectedInfo(InjectionMember<MethodInfo, object[]> member, Type type)
+        protected override MethodInfo? GetMemberInfo(InjectionMember<MethodInfo, object[]> member, Type type)
         {
-            var info = base.GetInjectedInfo(member, type);
-            if (null != info) return info;
-
-            if (null == member.Data || 0 == member.Data.Length)
-            {
-                foreach (var method in DeclaredMembers(type))
-                {
-                    if (method.Name == member.Name)
-                        return method;
-                }
-            }
-
-            return null;
+            return base.GetMemberInfo(member, type) ?? (null == member.Data || 0 == member.Data.Length
+                ? DeclaredMembers(type).FirstOrDefault(m => m.Name == member.Name)
+                : null);
         }
 
         #endregion

@@ -31,8 +31,8 @@ namespace Unity.Processors
                     info = memberInfo;
                     break;
 
-                case MethodBase<ConstructorInfo> injectionMember:
-                    info = GetInjectedInfo(injectionMember, type) ??
+                case InjectionMethodBase<ConstructorInfo> injectionMember:
+                    info = MemberInfo(injectionMember, type) ??
                             throw new InvalidOperationException(NoMatchFound, new InvalidRegistrationException());
                     resolvers = injectionMember.Data;
                     break;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using Unity.Builder;
+using Unity.Exceptions;
 using Unity.Injection;
 using Unity.Policy;
 using Unity.Registration;
@@ -53,24 +54,24 @@ namespace Unity.Processors
 
                     if (!member.CanWrite)
                         throw new InvalidOperationException(
-                            $"Readonly property '{member.Name}' on type '{type?.Name}' is marked for injection. Readonly properties cannot be injected");
+                            $"Readonly property '{member.Name}' on type '{type?.Name}' is marked for injection. Readonly properties cannot be injected", new InvalidRegistrationException());
 
                     if (0 != member.GetIndexParameters().Length)
                         throw new InvalidOperationException(
-                            $"Indexer '{member.Name}' on type '{type?.Name}' is marked for injection. Indexers cannot be injected");
+                            $"Indexer '{member.Name}' on type '{type?.Name}' is marked for injection. Indexers cannot be injected", new InvalidRegistrationException());
 
                     var setter = member.GetSetMethod(true);
                     if (setter.IsStatic)
                         throw new InvalidOperationException(
-                            $"Static property '{member.Name}' on type '{type?.Name}' is marked for injection. Static properties cannot be injected");
+                            $"Static property '{member.Name}' on type '{type?.Name}' is marked for injection. Static properties cannot be injected", new InvalidRegistrationException());
 
                     if (setter.IsPrivate)
                         throw new InvalidOperationException(
-                            $"Private property '{member.Name}' on type '{type?.Name}' is marked for injection. Private properties cannot be injected");
+                            $"Private property '{member.Name}' on type '{type?.Name}' is marked for injection. Private properties cannot be injected", new InvalidRegistrationException());
 
                     if (setter.IsFamily)
                         throw new InvalidOperationException(
-                            $"Protected property '{member.Name}' on type '{type?.Name}' is marked for injection. Protected properties cannot be injected");
+                            $"Protected property '{member.Name}' on type '{type?.Name}' is marked for injection. Protected properties cannot be injected", new InvalidRegistrationException());
 
                     yield return member;
                     break;
@@ -113,18 +114,6 @@ namespace Unity.Processors
                     throw;
                 }
             };
-        }
-
-        #endregion
-
-
-        #region Injection
-
-        protected override PropertyInfo? GetInjectedInfo(InjectionMember<PropertyInfo, object> member, Type type)
-        {
-            // TODO: Implement
-
-            return type.GetProperty(member.Name);
         }
 
         #endregion

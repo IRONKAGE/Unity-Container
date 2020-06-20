@@ -396,6 +396,13 @@ namespace Unity
                         ? (object)new Tuple<Type, string>(context.Type, context.Name)
                         : new Tuple<Type, Type, string>(context.RegistrationType, context.Type, context.Name));
 
+                if (!(ex.InnerException is InvalidRegistrationException) &&
+                    !(ex.InnerException is CircularDependencyException) &&
+                    !(ex is CircularDependencyException) &&
+                    !(ex is TargetInvocationException) &&  // TODO: Unpack internal exception
+                    !(ex is MakeGenericTypeFailedException))
+                    throw;
+
                 var message = CreateDiagnosticMessage(ex);
 
                 throw new ResolutionFailedException( context.RegistrationType, context.Name, message, ex);

@@ -101,7 +101,7 @@ namespace Unity.Processors
 
         protected MemberProcessor(IPolicySet policySet)
         {
-            MemberInfo = GetInjectedInfo;
+            MemberInfo = GetMemberInfo;
 
             // Add Unity attribute factories
             AttributeFactories = new[]
@@ -115,7 +115,7 @@ namespace Unity.Processors
 
         protected MemberProcessor(IPolicySet policySet, Type attribute)
         {
-            MemberInfo = GetInjectedInfo;
+            MemberInfo = GetMemberInfo;
 
             // Add Unity attribute factories
             AttributeFactories = new[]
@@ -246,8 +246,7 @@ namespace Unity.Processors
                                         _policySet.Get(typeof(TPolicyInterface)));
         }
 
-        protected virtual TMemberInfo? GetInjectedInfo(InjectionMember<TMemberInfo, TData> member, Type type) 
-            => member.MemberInfo(type);
+        protected virtual TMemberInfo? GetMemberInfo(InjectionMember<TMemberInfo, TData> member, Type type) => member.MemberInfo(type);
 
         #endregion
 
