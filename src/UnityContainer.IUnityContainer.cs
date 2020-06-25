@@ -65,10 +65,10 @@ namespace Unity
                 {
                     foreach (var member in injectionMembers)
                     {
-                        if (member is IAddPolicies contributor)
-                        {
-                            contributor.AddPolicies(mappedToType, name, ref registration);
-                        }
+                        //if (member is IAddPolicies contributor)
+                        //{
+                        //    contributor.AddPolicies(mappedToType, name, ref registration);
+                        //}
                     }
                 }
 
