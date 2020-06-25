@@ -60,17 +60,17 @@ namespace Unity
                 if (manager is IDisposable disposableManager)
                     container.LifetimeContainer.Add(disposableManager);
 
-                // Add Injection Members
-                if (null != injectionMembers && injectionMembers.Length > 0)
-                {
-                    foreach (var member in injectionMembers)
-                    {
-                        if (member is IAddPolicies contributor)
-                        {
-                            contributor.AddPolicies(mappedToType, name, ref registration);
-                        }
-                    }
-                }
+                //// Add Injection Members
+                //if (null != injectionMembers && injectionMembers.Length > 0)
+                //{
+                //    foreach (var member in injectionMembers)
+                //    {
+                //        if (member is IAddPolicies contributor)
+                //        {
+                //            contributor.AddPolicies(mappedToType, name, ref registration);
+                //        }
+                //    }
+                //}
 
                 // Check what strategies to run
                 registration.BuildChain = _strategiesChain.ToArray()

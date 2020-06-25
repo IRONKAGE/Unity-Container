@@ -13,7 +13,7 @@ namespace Unity.Injection
     /// </summary>
     /// <remarks>This factory allow using predefined <code>Func&lt;IUnityContainer, Type, string, object&gt;</code> to create types.</remarks>
     [Obsolete("InjectionFactory has been deprecated and will be removed in next release. Please use IUnityContainer.RegisterFactory(...) method instead.", false)]
-    public class InjectionFactory : InjectionMember, IAddPolicies
+    public class InjectionFactory : InjectionMember
     {
         #region Fields
 
